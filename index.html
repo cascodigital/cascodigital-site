@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Casco Digital Informática - Consultoria especializada em M365, Azure AD, PowerShell e Infraestrutura Cloud. Porto Alegre, RS.">
+    <meta name="keywords" content="M365, Azure AD, PowerShell, Infraestrutura Cloud, Consultoria IT">
+    <meta property="og:title" content="Casco Digital Informática">
+    <meta property="og:description" content="Infraestrutura de ponta sem complexidade desnecessária">
+    <meta property="og:image" content="./assets/images/turtle-hero.png">
+    <meta property="og:url" content="https://cascodigital.com.br">
+    <title>Casco Digital Informática | M365 & Cloud Consulting</title>
+
+    <style>
+        /* ============================================
+           RESET & BASE STYLES
+           ============================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0A0E27;
+            color: #E0E0E0;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* ============================================
+           BACKGROUNDS & PATTERNS
+           ============================================ */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #00D9FF, rgba(0, 217, 255, 0.2)),
+                radial-gradient(2px 2px at 60px 70px, #00D9FF, rgba(0, 217, 255, 0.1)),
+                radial-gradient(1px 1px at 50px 50px, #00FF00, rgba(0, 255, 0, 0.1));
+            background-size: 200px 200px;
+            background-repeat: repeat;
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ============================================
+           CIRCUIT PATTERN BACKGROUND
+           ============================================ */
+        .circuit-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+
+        .circuit-lines {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0.05;
+        }
+
+        /* ============================================
+           SCROLLBAR CUSTOMIZATION
+           ============================================ */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0A0E27;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #00D9FF;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00FF00;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
+        }
+
+        /* ============================================
+           HEADER / NAVIGATION - BANNER NO HEADER
+           ============================================ */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(10, 14, 39, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 217, 255, 0.2);
+            padding: 1rem 2rem;
+        }
+
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Logo com imagem + texto CASCO DIGITAL */
+        
+
+        
+
+        
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: #E0E0E0;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 300ms ease;
+            position: relative;
+        }
+
+        nav ul a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #00D9FF;
+            transition: width 300ms ease;
+        }
+
+        nav ul a:hover::after {
+            width: 100%;
+        }
+
+        nav ul a:hover {
+            color: #00D9FF;
+            text-shadow: 0 0 10px rgba(0, 217, 255, 0.5);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: #00D9FF;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 110;
+        }
+
+        /* ============================================
+           HERO SECTION
+           ============================================ */
+        .hero {
+            position: relative;
+            min-height: 60vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 2rem 2rem 2rem;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at 30% 50%, rgba(0, 217, 255, 0.1), transparent 50%),
+                        radial-gradient(circle at 70% 50%, rgba(0, 255, 0, 0.05), transparent 50%);
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            z-index: 2;
+        }
+
+        .hero-content {
+            animation: slideInLeft 0.8s ease-out;
+            animation-delay: 0.3s;
+            animation-fill-mode: both;
+        }
+
+        .hero-visual {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: slideInRight 0.8s ease-out;
+            animation-delay: 0.3s;
+            animation-fill-mode: both;
+        }
+
+        .hero-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 900;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            letter-spacing: -1px;
+        }
+
+        .hero-title-main {
+            color: #E0E0E0;
+            display: block;
+        }
+
+        .hero-title-accent {
+            color: #00D9FF;
+            text-shadow: 0 0 20px rgba(0, 217, 255, 0.5),
+                         0 0 40px rgba(0, 217, 255, 0.2);
+            display: block;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+            color: #A0A0A0;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            max-width: 90%;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 0.9rem 2rem;
+            background: linear-gradient(135deg, #00D9FF, #00E5CC);
+            color: #0A0E27;
+            border: none;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 300ms ease;
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #00FF00, #00E5CC);
+            transition: left 300ms ease;
+            z-index: -1;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 217, 255, 0.6),
+                        0 0 30px rgba(0, 255, 0, 0.3);
+        }
+
+        .cta-button:hover::before {
+            left: 0;
+        }
+
+        .turtle-hero {
+            width: 100%;
+            max-width: 450px;
+            height: auto;
+            filter: drop-shadow(0 0 30px rgba(0, 217, 255, 0.4));
+            animation: floatHero 3s ease-in-out infinite;
+        }
+
+        @keyframes floatHero {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* ============================================
+           SCROLL INDICATOR
+           ============================================ */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+            color: #00D9FF;
+            z-index: 10;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(10px); }
+        }
+
+        /* ============================================
+           PILLARS SECTION
+           ============================================ */
+        .pillars {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 6rem auto;
+            padding: 0 2rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 3rem;
+            color: #E0E0E0;
+        }
+
+        .section-title-accent {
+            color: #00D9FF;
+        }
+
+        .pillars-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .pillar-card {
+            background: rgba(26, 31, 58, 0.8);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: 8px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 300ms ease;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+        }
+
+        .pillar-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 0, 0.1), transparent);
+            transition: left 600ms ease;
+        }
+
+        .pillar-card:hover::before {
+            left: 100%;
+        }
+
+        .pillar-card:hover {
+            border-color: #00D9FF;
+            transform: translateY(-8px);
+            box-shadow: 0 0 30px rgba(0, 217, 255, 0.4),
+                        inset 0 0 20px rgba(0, 217, 255, 0.1);
+        }
+
+        .pillar-icon {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            background: rgba(0, 217, 255, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(0, 217, 255, 0.3);
+        }
+
+        .pillar-card:hover .pillar-icon {
+            background: rgba(0, 255, 0, 0.2);
+            border-color: #00FF00;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.4);
+        }
+
+        .pillar-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            color: #00D9FF;
+        }
+
+        .pillar-description {
+            color: #A0A0A0;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        /* ============================================
+           ABOUT SECTION
+           ============================================ */
+        .about {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 6rem auto;
+            padding: 0.5rem 2rem 2rem 2rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .about-content h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: #E0E0E0;
+        }
+
+        .about-content h2 span {
+            color: #00D9FF;
+        }
+
+        .about-content p {
+            color: #A0A0A0;
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+            font-size: 1rem;
+        }
+
+        .about-visual {
+            display: flex;
+            justify-content: center;
+        }
+
+        .about-visual img {
+            width: 100%;
+            max-width: 400px;
+            filter: drop-shadow(0 0 30px rgba(0, 217, 255, 0.3));
+        }
+
+        /* ============================================
+           SERVICES SECTION
+           ============================================ */
+        .services {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 6rem auto;
+            padding: 0 2rem;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .service-card {
+            background: rgba(26, 31, 58, 0.8);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            border-radius: 8px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 300ms ease;
+            backdrop-filter: blur(10px);
+            animation: fadeInUp 0.6s ease-out;
+            animation-fill-mode: both;
+        }
+
+        .service-card:nth-child(1) { animation-delay: 0.1s; }
+        .service-card:nth-child(2) { animation-delay: 0.2s; }
+        .service-card:nth-child(3) { animation-delay: 0.3s; }
+        .service-card:nth-child(4) { animation-delay: 0.4s; }
+        .service-card:nth-child(5) { animation-delay: 0.5s; }
+        .service-card:nth-child(6) { animation-delay: 0.6s; }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .service-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(0, 217, 255, 0.1), transparent);
+            transition: all 300ms ease;
+        }
+
+        .service-card:hover {
+            border-color: #00D9FF;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(0, 217, 255, 0.3),
+                        inset 0 0 20px rgba(0, 217, 255, 0.1);
+        }
+
+        .service-card:hover::after {
+            top: -25%;
+            right: -25%;
+        }
+
+        .service-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .service-name {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #00D9FF;
+            margin-bottom: 0.8rem;
+        }
+
+        .service-description {
+            color: #A0A0A0;
+            line-height: 1.6;
+            font-size: 0.9rem;
+        }
+
+        /* ============================================
+           TECHNOLOGIES SECTION
+           ============================================ */
+        .technologies {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 6rem auto;
+            padding: 0.5rem 2rem 2rem 2rem;
+            text-align: center;
+        }
+
+        .tech-badges {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .tech-badge {
+            display: inline-block;
+            padding: 0.6rem 1.5rem;
+            background: rgba(0, 217, 255, 0.1);
+            border: 1px solid #00D9FF;
+            border-radius: 20px;
+            color: #00D9FF;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: all 300ms ease;
+        }
+
+        .tech-badge:hover {
+            background: rgba(0, 217, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 217, 255, 0.4);
+            transform: translateY(-3px);
+        }
+
+        /* ============================================
+           CONTACT SECTION
+           ============================================ */
+        .contact {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 6rem auto;
+            padding: 0.5rem 2rem 2rem 2rem;
+            background: rgba(26, 31, 58, 0.6);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .contact h2 {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: #E0E0E0;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #00D9FF;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            background: rgba(10, 14, 39, 0.8);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: 6px;
+            color: #E0E0E0;
+            font-family: inherit;
+            transition: all 300ms ease;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #00D9FF;
+            box-shadow: 0 0 15px rgba(0, 217, 255, 0.3);
+            background: rgba(10, 14, 39, 0.95);
+        }
+
+        .form-group input.error,
+        .form-group textarea.error {
+            border-color: #FF3333;
+            box-shadow: 0 0 15px rgba(255, 51, 51, 0.3);
+        }
+
+        .form-group input.success,
+        .form-group textarea.success {
+            border-color: #00FF00;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #00D9FF, #00FF00);
+            color: #0A0E27;
+            border: none;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 300ms ease;
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.4);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 217, 255, 0.6);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .form-message {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 600;
+            display: none;
+        }
+
+        .form-message.success {
+            background: rgba(0, 255, 0, 0.2);
+            border: 1px solid #00FF00;
+            color: #00FF00;
+            display: block;
+        }
+
+        .form-message.error {
+            background: rgba(255, 51, 51, 0.2);
+            border: 1px solid #FF3333;
+            color: #FF3333;
+            display: block;
+        }
+
+        /* ============================================
+           CONTACT INFO
+           ============================================ */
+        .contact-info {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 4rem auto;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            text-align: center;
+        }
+
+        .info-item {
+            padding: 2rem;
+            background: rgba(26, 31, 58, 0.5);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            border-radius: 8px;
+            transition: all 300ms ease;
+        }
+
+        .info-item:hover {
+            border-color: #00D9FF;
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .info-item h3 {
+            color: #00D9FF;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .info-item p {
+            color: #A0A0A0;
+            word-break: break-all;
+        }
+
+        .info-item a {
+            color: #00D9FF;
+            text-decoration: none;
+            transition: all 300ms ease;
+        }
+
+        .info-item a:hover {
+            color: #00FF00;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+
+        /* ============================================
+           FLOATING WHATSAPP BUTTON
+           ============================================ */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 99;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #00D9FF, #00FF00);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            box-shadow: 0 5px 25px rgba(0, 217, 255, 0.5);
+            animation: bounce 2s infinite;
+            font-size: 1.8rem;
+            transition: all 300ms ease;
+        }
+
+        .whatsapp-float:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 35px rgba(0, 217, 255, 0.7);
+        }
+
+        /* ============================================
+           FOOTER
+           ============================================ */
+        footer {
+            position: relative;
+            z-index: 1;
+            background: rgba(10, 14, 39, 0.95);
+            border-top: 1px solid rgba(0, 217, 255, 0.2);
+            padding: 2rem;
+            text-align: center;
+            color: #A0A0A0;
+        }
+
+        footer p {
+            margin-bottom: 1rem;
+        }
+
+        footer a {
+            color: #00D9FF;
+            text-decoration: none;
+            transition: all 300ms ease;
+        }
+
+        footer a:hover {
+            color: #00FF00;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+        }
+
+        /* ============================================
+           RESPONSIVE DESIGN
+           ============================================ */
+        @media (max-width: 768px) {
+            nav ul {
+                display: none;
+                position: absolute;
+                top: 70px;
+                left: 0;
+                right: 0;
+                flex-direction: column;
+                background: rgba(10, 14, 39, 0.98);
+                padding: 2rem;
+                gap: 1rem;
+                border-bottom: 1px solid rgba(0, 217, 255, 0.2);
+            }
+
+            nav ul.active {
+                display: flex;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            
+
+            
+
+            
+
+            .hero-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .hero-visual {
+                order: -1;
+            }
+
+            .about {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-title {
+                font-size: 1.8rem;
+            }
+
+            .hero-subtitle {
+                max-width: 100%;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
+
+            .contact-info {
+                grid-template-columns: 1fr;
+            }
+
+            .whatsapp-float {
+                width: 50px;
+                height: 50px;
+                font-size: 1.5rem;
+                bottom: 1rem;
+                right: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                padding: 0.8rem 1rem;
+            }
+
+            
+
+            
+
+            
+
+            .hero {
+                min-height: auto;
+                padding: 2rem 1rem;
+            }
+
+            .hero-title {
+                font-size: 1.5rem;
+            }
+
+            .turtle-hero {
+                max-width: 300px;
+            }
+
+            nav {
+                padding: 0;
+            }
+
+            nav ul {
+                top: 60px;
+            }
+
+            .pillars,
+            .services,
+            .about,
+            .contact,
+            .contact-info,
+            .technologies {
+                padding: 2rem 1rem;
+            }
+
+            .pillars-grid,
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cta-button {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    
+        /* NAVBAR REDESIGN - 3 Column Layout */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+#            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 26, 47, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(0, 217, 255, 0.1);
+            gap: 2rem;
+        }
+
+        .nav-left {
+            display: flex;
+            gap: 0.8rem;
+            align-items: center;
+            flex: 0 0 auto;
+        }
+
+        .quick-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            white-space: nowrap;
+        }
+
+        .suporte-btn {
+            background: linear-gradient(135deg, #00D9FF 0%, #0099CC 100%);
+            color: #0A1A2F;
+        }
+
+        .suporte-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 217, 255, 0.4);
+        }
+
+        .chamados-btn {
+            background: rgba(0, 217, 255, 0.1);
+            color: #00D9FF;
+            border-color: #00D9FF;
+        }
+
+        .chamados-btn:hover {
+            background: rgba(0, 217, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 217, 255, 0.3);
+        }
+
+        .quick-btn svg {
+            flex-shrink: 0;
+        }
+
+        .nav-center {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .brand-name {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: #00D9FF;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .brand-name:hover {
+            text-shadow: 0 0 20px rgba(0, 217, 255, 0.6);
+        }
+
+        .nav-right {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            margin: 0;
+            padding: 0;
+            flex: 0 0 auto;
+        }
+
+        .nav-right li a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-right li a:hover {
+            color: #00D9FF;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: #00D9FF;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        @media (max-width: 1200px) {
+            nav {
+                padding: 1rem 1.5rem;
+                gap: 1rem;
+            }
+
+            .quick-btn {
+                padding: 0.5rem 0.8rem;
+                font-size: 0.8rem;
+            }
+
+            .quick-btn svg {
+                width: 14px;
+                height: 14px;
+            }
+
+            .brand-name {
+                font-size: 1.3rem;
+            }
+
+            .nav-right {
+                gap: 1.5rem;
+            }
+        }
+
+        @media (max-width: 968px) {
+            nav {
+                flex-wrap: wrap;
+            }
+
+            .nav-left {
+                order: 1;
+                flex: 1;
+            }
+
+            .nav-center {
+                order: 2;
+                flex: 0 0 auto;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+                order: 3;
+            }
+
+            .nav-right {
+                order: 4;
+                flex-basis: 100%;
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+                padding: 1rem 0;
+                display: none;
+            }
+
+            .nav-right.active {
+                display: flex;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .nav-left {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .quick-btn {
+                font-size: 0.75rem;
+                padding: 0.4rem 0.6rem;
+            }
+
+            .brand-name {
+                font-size: 1.1rem;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Circuit Background -->
+    <div class="circuit-bg">
+        <svg class="circuit-lines" viewBox="0 0 1000 1000">
+            <defs>
+                <pattern id="circuit" x="0" y="0" width="200" height="200" patternUnits="userSpaceOnUse">
+                    <path d="M0,100 L100,100 L100,0" stroke="#00D9FF" stroke-width="1" fill="none"/>
+                    <circle cx="100" cy="100" r="3" fill="#00D9FF"/>
+                    <path d="M200,100 L100,100 L100,200" stroke="#00FF00" stroke-width="1" fill="none"/>
+                </pattern>
+            </defs>
+            <rect width="1000" height="1000" fill="url(#circuit)"/>
+        </svg>
+    </div>
+
+    <!-- Header com Banner + Texto CASCO DIGITAL -->
+    <header>
+        <nav>
+            <!-- Left: Quick Access Buttons -->
+            <div class="nav-left">
+                <a href="https://suporte.cascodigital.com.br" class="quick-btn suporte-btn" target="_blank">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                    Suporte Remoto
+                </a>
+                    <a href="https://chamados.cascodigital.com.br" class="quick-btn chamados-btn" target="_blank">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                    </svg>
+                    Portal de Chamados
+                </a>
+            </div>
+
+            <!-- Center: Brand Name -->
+            <div class="nav-center">
+                <a href="#home" class="brand-name">CASCO DIGITAL</a>
+            </div>
+
+            <!-- Right: Navigation Menu -->
+            <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+            <ul id="navMenu" class="nav-right">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#pillars">Pilares</a></li>
+                <li><a href="#about">Sobre</a></li>
+                <li><a href="#services">Serviços</a></li>
+                <li><a href="#contact">Contato</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-bg"></div>
+
+        <div class="hero-container">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    <span class="hero-title-main">Infraestrutura de ponta</span>
+                    <span class="hero-title-accent">sem complexidade</span>
+                    <span class="hero-title-main">desnecessária</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Consultoria especializada em M365, Automação PowerShell, Identity & Access Management e Infraestrutura Cloud. Transformamos ambientes corporativos com tecnologia de ponta e simplicidade.
+                </p>
+                <a href="https://wa.me/5551992413388?text=Olá%20Casco%20Digital%2C%20gostaria%20de%20uma%20consulta" class="cta-button">Solicitar Consulta</a>
+            </div>
+            <div class="hero-visual">
+                <img src="./assets/images/turtle-hero.png" alt="Tartaruga Tech - Mascote Casco Digital" class="turtle-hero">
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <div style="font-size: 2rem; animation: bounce 2s infinite;">↓</div>
+        </div>
+    </section>
+
+    <!-- Pillars Section -->
+    <section class="pillars" id="pillars">
+        <h2 class="section-title">Nossos <span class="section-title-accent">3 Pilares</span></h2>
+        <div class="pillars-grid">
+            <div class="pillar-card">
+                <div class="pillar-icon">☁️</div>
+                <h3 class="pillar-title">M365 & Identidade</h3>
+                <p class="pillar-description">Exchange, SharePoint, Teams, OneDrive, Azure AD (Entra ID), Conditional Access e Hybrid Identity. Gerenciamento completo de identidade corporativa.</p>
+            </div>
+            <div class="pillar-card">
+                <div class="pillar-icon">⚙️</div>
+                <h3 class="pillar-title">Automação PowerShell</h3>
+                <p class="pillar-description">Scripts avançados, automação de processos, integração de sistemas e otimização de workflows. Redução de 80% no tempo de execução.</p>
+            </div>
+            <div class="pillar-card">
+                <div class="pillar-icon">🏗️</div>
+                <h3 class="pillar-title">Infraestrutura & Nuvem</h3>
+                <p class="pillar-description">Windows Server, DNS, DHCP, Azure, Intune MDM. Infraestrutura escalável e resiliente.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about" id="about">
+        <div class="about-content">
+            <h2><span>Por que</span> Casco Digital?</h2>
+            <p>
+                🎯 <strong>Foco em Simplicidade:</strong> Eliminamos complexidade desnecessária. Cada solução é pensada para ser clara e manutenível.
+            </p>
+            <p>
+                💡 <strong>Expertise Comprovada:</strong> Nossa equipe possui profundo conhecimento em Microsoft 365, Azure e Infraestrutura Cloud. Certificações atualizadas.
+            </p>
+            <p>
+                ⚡ <strong>Automação Inteligente:</strong> PowerShell avançado para eliminar tarefas repetitivas. Mais produtividade, menos erros.
+            </p>
+            <p>
+                🛡️ <strong>Suporte Dedicado:</strong> Consultores experientes disponíveis para questões críticas. Resposta rápida, soluções eficientes.
+            </p>
+            <p>
+                🌱 <strong>Mindset Cloud-First:</strong> Orientamos sua infraestrutura para o futuro, mantendo compatibilidade com sistemas legados.
+            </p>
+        </div>
+        <div class="about-visual">
+            <img src="./assets/images/turtle-laptop.png" alt="Tartaruga com laptop">
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section class="services" id="services">
+        <h2 class="section-title">Nossos <span class="section-title-accent">Serviços</span></h2>
+        <div class="services-grid">
+            <div class="service-card">
+                <span class="service-icon">📧</span>
+                <h3 class="service-name">Administração M365</h3>
+                <p class="service-description">Gerenciamento completo de Exchange, SharePoint, Teams, OneDrive. Configuração, migração e otimização.</p>
+            </div>
+            <div class="service-card">
+                <span class="service-icon">🔐</span>
+                <h3 class="service-name">Azure AD & Identidade</h3>
+                <p class="service-description">Entra ID, Conditional Access, Hybrid Identity, MFA. Segurança de identidade corporativa de ponta.</p>
+            </div>
+            <div class="service-card">
+                <span class="service-icon">🔧</span>
+                <h3 class="service-name">Automação PowerShell</h3>
+                <p class="service-description">Scripts customizados, bulk operations.. Automação completa de processos Microsoft.</p>
+            </div>
+            <div class="service-card">
+                <span class="service-icon">📱</span>
+                <h3 class="service-name">Intune & MDM</h3>
+                <p class="service-description">Mobile Device Management, Windows 10/11. Gerenciamento seguro de dispositivos corporativos.</p>
+            </div>
+            <div class="service-card">
+                <span class="service-icon">🏢</span>
+                <h3 class="service-name">Infraestrutura & Nuvem</h3>
+                <p class="service-description">Windows Server, DNS, DHCP, Redes, Mikrotik. Arquitetura escalável e resiliente.</p>
+            </div>
+            <div class="service-card">
+                <span class="service-icon">💼</span>
+                <h3 class="service-name">Consultoria & Planejamento</h3>
+                <p class="service-description">Planejamento estratégico, assessoria tecnológica, roadmap de transformação digital. Visão executiva de TI.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technologies Section -->
+    <section class="technologies">
+        <h2 class="section-title">Tecnologias <span class="section-title-accent">Dominadas</span></h2>
+        <div class="tech-badges">
+            <span class="tech-badge">Microsoft 365</span>
+            <span class="tech-badge">Azure</span>
+            <span class="tech-badge">Entra ID</span>
+            <span class="tech-badge">PowerShell</span>
+            <span class="tech-badge">Intune</span>
+            <span class="tech-badge">Windows Server</span>
+            <span class="tech-badge">AD</span>
+            <span class="tech-badge">DHCP/DNS</span>
+            <span class="tech-badge">Firewall</span>
+            
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact" id="contact">
+        <h2>Entre em <span style="color: #00D9FF;">Contato</span></h2>
+        <form id="contactForm">
+            <div class="form-group">
+                <label for="name">Nome</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Telefone</label>
+                <input type="tel" id="phone" name="phone" required>
+            </div>
+            <div class="form-group">
+                <label for="message">Mensagem</label>
+                <textarea id="message" name="message" required></textarea>
+            </div>
+            <button type="submit" class="submit-btn">Enviar Mensagem</button>
+            <div class="form-message" id="formMessage"></div>
+        </form>
+    </section>
+
+    <!-- Contact Info -->
+    <div class="contact-info">
+        <div class="info-item">
+            <h3>📧 Email</h3>
+            <p><a href="mailto:suporte@cascodigital.com.br">suporte@cascodigital.com.br</a></p>
+        </div>
+        <div class="info-item">
+            <h3>📞 Telefone</h3>
+            <p><a href="tel:+555131999920">(51) 3199-9920</a></p>
+        </div>
+        <div class="info-item">
+            <h3>📍 Localização</h3>
+            <p>Porto Alegre<br>Rio Grande do Sul, Brasil</p>
+        </div>
+    </div>
+
+    <!-- Floating WhatsApp Button -->
+    <a href="https://wa.me/5551992413388?text=Olá%20Casco%20Digital%2C%20gostaria%20de%20uma%20consulta" class="whatsapp-float" target="_blank">
+        💬
+    </a>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 Casco Digital Informática. Todos os direitos reservados.</p>
+        <p>
+            <a href="https://github.com/cascodigital" target="_blank">GitHub</a> | 
+            <a href="https://wa.me/5551992413388" target="_blank">WhatsApp</a>
+        </p>
+        <p style="font-size: 0.85rem; margin-top: 1rem;">Desenvolvido com 🐢 e tecnologia cyberpunk.</p>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const navMenu = document.getElementById('navMenu');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+        });
+
+        // Close menu when link clicked
+        navMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                navMenu.classList.remove('active');
+            });
+        });
+
+        // Scroll Reveal Animation
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.service-card, .pillar-card').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Contact Form Handler
+        const contactForm = document.getElementById('contactForm');
+        const formMessage = document.getElementById('formMessage');
+
+        contactForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(contactForm);
+            const data = Object.fromEntries(formData);
+
+            formMessage.className = 'form-message';
+            formMessage.textContent = 'Enviando...';
+            formMessage.style.display = 'block';
+
+            try {
+                const response = await fetch('/api/contact', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erro na API');
+                }
+
+                const result = await response.json();
+                if (!result.ok) {
+                    throw new Error(result.error || 'Erro ao enviar.');
+                }
+
+                formMessage.className = 'form-message success';
+                formMessage.textContent = '✓ Mensagem enviada com sucesso! Entraremos em contato em breve.';
+                contactForm.reset();
+
+                setTimeout(() => {
+                    formMessage.style.display = 'none';
+                }, 5000);
+            } catch (err) {
+                formMessage.className = 'form-message error';
+                formMessage.textContent = 'Erro ao enviar. Tente novamente em instantes.';
+            }
+        });
+
+        // Input validation visual feedback
+        const inputs = contactForm.querySelectorAll('input, textarea');
+        inputs.forEach(input => {
+            input.addEventListener('blur', () => {
+                if (input.value.trim() !== '') {
+                    input.classList.add('success');
+                    input.classList.remove('error');
+                }
+            });
+
+            input.addEventListener('invalid', () => {
+                input.classList.add('error');
+                input.classList.remove('success');
+            });
+        });
+    </script>
+</body>
+</html>

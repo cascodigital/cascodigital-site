@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="The Guardian - Auditoria de Email gratuita. Verifique SPF, DMARC e MX do seu domínio e descubra o Score de Risco em segundos. Casco Digital.">
+    <meta property="og:title" content="The Guardian | Auditoria de Email - Casco Digital">
+    <meta property="og:description" content="Audite SPF, DMARC e MX do seu domínio. Score de risco 0-100 gratuito.">
+    <meta property="og:url" content="https://cascodigital.com.br/guardian">
+    <title>The Guardian | Auditoria de Email - Casco Digital</title>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0A0E27;
+            color: #E0E0E0;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image:
+                radial-gradient(2px 2px at 20px 30px, #00D9FF, rgba(0,217,255,0.2)),
+                radial-gradient(2px 2px at 60px 70px, #00D9FF, rgba(0,217,255,0.1)),
+                radial-gradient(1px 1px at 50px 50px, #00FF00, rgba(0,255,0,0.1));
+            background-size: 200px 200px;
+            background-repeat: repeat;
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: #0A0E27; }
+        ::-webkit-scrollbar-thumb { background: #00D9FF; border-radius: 5px; }
+        ::-webkit-scrollbar-thumb:hover { background: #00FF00; }
+
+        /* ── NAV ── */
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(10,14,39,0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0,217,255,0.2);
+        }
+
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            gap: 2rem;
+        }
+
+        .nav-left { display: flex; gap: 0.8rem; align-items: center; flex: 0 0 auto; }
+
+        .quick-btn {
+            display: flex; align-items: center; gap: 0.5rem;
+            padding: 0.6rem 1rem; border-radius: 8px; font-size: 0.85rem;
+            font-weight: 600; text-decoration: none; transition: all 0.3s ease;
+            border: 2px solid transparent; white-space: nowrap;
+        }
+        .suporte-btn { background: linear-gradient(135deg, #00D9FF 0%, #0099CC 100%); color: #0A1A2F; }
+        .suporte-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,217,255,0.4); }
+        .chamados-btn { background: rgba(0,217,255,0.1); color: #00D9FF; border-color: #00D9FF; }
+        .chamados-btn:hover { background: rgba(0,217,255,0.2); transform: translateY(-2px); }
+
+        .nav-center { flex: 1; display: flex; justify-content: center; }
+        .brand-name {
+            font-size: 1.5rem; font-weight: 800; letter-spacing: 2px;
+            color: #00D9FF; text-decoration: none; transition: all 0.3s ease;
+        }
+        .brand-name:hover { text-shadow: 0 0 20px rgba(0,217,255,0.6); }
+
+        .nav-right { display: flex; list-style: none; gap: 2rem; margin: 0; padding: 0; flex: 0 0 auto; }
+        .nav-right li a { color: #fff; text-decoration: none; font-weight: 500; transition: color 0.3s ease; }
+        .nav-right li a:hover, .nav-right li a.active { color: #00D9FF; }
+
+        .mobile-menu-btn {
+            display: none; background: none; border: none;
+            color: #00D9FF; font-size: 1.5rem; cursor: pointer;
+        }
+
+        /* ── HERO ── */
+        .guardian-hero {
+            position: relative;
+            padding: 5rem 2rem 3rem;
+            text-align: center;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .guardian-hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at 50% 40%, rgba(0,217,255,0.08), transparent 60%);
+            z-index: -1;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 0.4rem 1.2rem;
+            background: rgba(0,217,255,0.1);
+            border: 1px solid rgba(0,217,255,0.3);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: #00D9FF;
+            margin-bottom: 1.5rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .guardian-hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+        }
+
+        .guardian-hero h1 span {
+            color: #00D9FF;
+            text-shadow: 0 0 30px rgba(0,217,255,0.4);
+        }
+
+        .guardian-hero p {
+            font-size: 1.15rem;
+            color: #A0A0A0;
+            max-width: 600px;
+            margin: 0 auto 2.5rem;
+            line-height: 1.6;
+        }
+
+        /* ── AUDIT FORM ── */
+        .audit-form-container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .audit-form {
+            display: flex;
+            gap: 0;
+            border: 1px solid rgba(0,217,255,0.4);
+            border-radius: 10px;
+            overflow: hidden;
+            background: rgba(26,31,58,0.8);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 40px rgba(0,217,255,0.1);
+        }
+
+        .audit-input {
+            flex: 1;
+            padding: 1.1rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: #E0E0E0;
+            font-size: 1rem;
+            outline: none;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .audit-input::placeholder { color: #555; }
+
+        .audit-btn {
+            padding: 1.1rem 2rem;
+            background: linear-gradient(135deg, #00D9FF, #00E5CC);
+            color: #0A0E27;
+            border: none;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .audit-btn:hover { background: linear-gradient(135deg, #00FF00, #00E5CC); }
+        .audit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .form-hint {
+            font-size: 0.8rem;
+            color: #555;
+            margin-top: 0.6rem;
+            text-align: center;
+        }
+
+        /* ── RESULTS ── */
+        .results-section {
+            max-width: 900px;
+            margin: 3rem auto;
+            padding: 0 2rem;
+            display: none;
+        }
+
+        .results-section.visible { display: block; }
+
+        /* Score Card */
+        .score-card {
+            background: rgba(26,31,58,0.9);
+            border: 1px solid rgba(0,217,255,0.3);
+            border-radius: 12px;
+            padding: 2.5rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .score-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--score-color, #00D9FF);
+        }
+
+        .score-domain {
+            font-size: 1rem;
+            color: #A0A0A0;
+            margin-bottom: 0.5rem;
+            font-family: monospace;
+        }
+
+        .score-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #A0A0A0;
+            margin-bottom: 1rem;
+        }
+
+        .score-number {
+            font-size: 5rem;
+            font-weight: 900;
+            color: var(--score-color, #00D9FF);
+            text-shadow: 0 0 30px var(--score-glow, rgba(0,217,255,0.4));
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .score-bar-wrapper {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            height: 12px;
+            width: 100%;
+            max-width: 400px;
+            margin: 1.5rem auto 1rem;
+            overflow: hidden;
+        }
+
+        .score-bar {
+            height: 100%;
+            border-radius: 10px;
+            background: var(--score-color, #00D9FF);
+            box-shadow: 0 0 10px var(--score-glow, rgba(0,217,255,0.5));
+            transition: width 1s ease;
+        }
+
+        .score-verdict {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--score-color, #00D9FF);
+        }
+
+        /* Detail Cards */
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .detail-card {
+            background: rgba(26,31,58,0.8);
+            border: 1px solid rgba(0,217,255,0.2);
+            border-radius: 10px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .detail-card:hover {
+            border-color: rgba(0,217,255,0.4);
+            transform: translateY(-2px);
+        }
+
+        .detail-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .detail-icon { font-size: 1.5rem; }
+
+        .detail-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #A0A0A0;
+        }
+
+        .detail-status {
+            margin-left: auto;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .status-ok { background: rgba(0,255,0,0.1); color: #00FF00; border: 1px solid rgba(0,255,0,0.3); }
+        .status-warn { background: rgba(255,193,7,0.1); color: #FFC107; border: 1px solid rgba(255,193,7,0.3); }
+        .status-bad { background: rgba(255,82,82,0.1); color: #FF5252; border: 1px solid rgba(255,82,82,0.3); }
+
+        .detail-value {
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #A0A0A0;
+            word-break: break-all;
+            background: rgba(0,0,0,0.3);
+            padding: 0.6rem;
+            border-radius: 6px;
+            margin-bottom: 0.75rem;
+            min-height: 2.5rem;
+        }
+
+        .detail-rec {
+            font-size: 0.85rem;
+            color: #E0E0E0;
+            line-height: 1.5;
+        }
+
+        /* Impact Section */
+        .impact-card {
+            background: rgba(26,31,58,0.9);
+            border: 1px solid rgba(255,82,82,0.3);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .impact-card h3 {
+            font-size: 1.1rem;
+            color: #FF5252;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .impact-text {
+            font-size: 0.95rem;
+            color: #C0C0C0;
+            line-height: 1.7;
+        }
+
+        /* CTA */
+        .cta-card {
+            background: linear-gradient(135deg, rgba(0,217,255,0.1), rgba(0,255,0,0.05));
+            border: 1px solid rgba(0,217,255,0.3);
+            border-radius: 12px;
+            padding: 2.5rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .cta-card h3 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 0.75rem;
+            color: #E0E0E0;
+        }
+
+        .cta-card p { color: #A0A0A0; margin-bottom: 1.5rem; }
+
+        .cta-button {
+            display: inline-block;
+            padding: 0.9rem 2.5rem;
+            background: linear-gradient(135deg, #00D9FF, #00E5CC);
+            color: #0A0E27;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(0,217,255,0.4);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,217,255,0.6);
+            background: linear-gradient(135deg, #00FF00, #00E5CC);
+        }
+
+        /* Error */
+        .error-box {
+            background: rgba(255,82,82,0.1);
+            border: 1px solid rgba(255,82,82,0.4);
+            border-radius: 8px;
+            padding: 1rem 1.5rem;
+            color: #FF5252;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        /* Loading */
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 3rem;
+            color: #00D9FF;
+        }
+
+        .spinner {
+            width: 40px; height: 40px;
+            border: 3px solid rgba(0,217,255,0.2);
+            border-top-color: #00D9FF;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* How it works */
+        .how-section {
+            max-width: 900px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+        }
+
+        .how-section h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .how-section h2 span { color: #00D9FF; }
+
+        .how-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .how-card {
+            background: rgba(26,31,58,0.6);
+            border: 1px solid rgba(0,217,255,0.15);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .how-card .how-icon { font-size: 2rem; margin-bottom: 0.75rem; }
+        .how-card h4 { color: #00D9FF; margin-bottom: 0.5rem; font-size: 0.95rem; }
+        .how-card p { font-size: 0.85rem; color: #A0A0A0; line-height: 1.5; }
+
+        /* Footer */
+        footer {
+            background: rgba(10,14,39,0.95);
+            border-top: 1px solid rgba(0,217,255,0.1);
+            padding: 2rem;
+            text-align: center;
+            color: #555;
+            font-size: 0.85rem;
+        }
+
+        footer a { color: #00D9FF; text-decoration: none; }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            nav { flex-wrap: wrap; }
+            .nav-left { order: 1; flex: 1; }
+            .nav-center { order: 2; flex: 0 0 auto; }
+            .mobile-menu-btn { display: block; order: 3; }
+            .nav-right {
+                order: 4; flex-basis: 100%; flex-direction: column;
+                text-align: center; gap: 1rem; padding: 1rem 0; display: none;
+            }
+            .nav-right.active { display: flex; }
+            .audit-form { flex-direction: column; }
+            .audit-btn { border-radius: 0; }
+        }
+
+        @media (max-width: 640px) {
+            .nav-left { flex-direction: column; gap: 0.5rem; }
+            .quick-btn { font-size: 0.75rem; padding: 0.4rem 0.6rem; }
+            .brand-name { font-size: 1.1rem; }
+            .guardian-hero { padding: 3rem 1.5rem 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <nav>
+            <div class="nav-left">
+                <a href="https://suporte.cascodigital.com.br" class="quick-btn suporte-btn" target="_blank">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                        <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                    Suporte Remoto
+                </a>
+                <a href="https://chamados.cascodigital.com.br" class="quick-btn chamados-btn" target="_blank">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+                    </svg>
+                    Portal de Chamados
+                </a>
+            </div>
+            <div class="nav-center">
+                <a href="/" class="brand-name">CASCO DIGITAL</a>
+            </div>
+            <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
+            <ul id="navMenu" class="nav-right">
+                <li><a href="/">Home</a></li>
+                <li><a href="/#pillars">Pilares</a></li>
+                <li><a href="/#services">Serviços</a></li>
+                <li><a href="/guardian" class="active">The Guardian</a></li>
+                <li><a href="/#contact">Contato</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero -->
+    <section class="guardian-hero">
+        <div class="hero-badge">🛡️ Ferramenta Gratuita</div>
+        <h1>The <span>Guardian</span></h1>
+        <p>Audite SPF, DMARC e MX do seu domínio em segundos. Descubra seu Score de Risco e saiba se cibercriminosos podem enviar emails falsos no nome da sua empresa.</p>
+
+        <div class="audit-form-container">
+            <form class="audit-form" id="auditForm">
+                <input
+                    type="text"
+                    class="audit-input"
+                    id="domainInput"
+                    placeholder="seupdominio.com.br"
+                    autocomplete="off"
+                    autocapitalize="none"
+                    spellcheck="false"
+                />
+                <button type="submit" class="audit-btn" id="auditBtn">Auditar Agora</button>
+            </form>
+            <p class="form-hint">Não precisa de cadastro. 100% gratuito.</p>
+            <div class="error-box" id="errorBox"></div>
+        </div>
+    </section>
+
+    <!-- Loading -->
+    <div class="loading-spinner" id="loadingSpinner">
+        <div class="spinner"></div>
+        <p>Consultando DNS...</p>
+    </div>
+
+    <!-- Results -->
+    <div class="results-section" id="resultsSection">
+
+        <!-- Score Card -->
+        <div class="score-card" id="scoreCard">
+            <div class="score-domain" id="scoreDomain"></div>
+            <div class="score-label">Score de Risco</div>
+            <div class="score-number" id="scoreNumber">0</div>
+            <div class="score-bar-wrapper">
+                <div class="score-bar" id="scoreBar" style="width: 0%"></div>
+            </div>
+            <div class="score-verdict" id="scoreVerdict"></div>
+        </div>
+
+        <!-- SPF / DMARC / MX -->
+        <div class="detail-grid">
+            <div class="detail-card" id="spfCard">
+                <div class="detail-header">
+                    <span class="detail-icon">📧</span>
+                    <span class="detail-title">SPF</span>
+                    <span class="detail-status" id="spfStatus"></span>
+                </div>
+                <div class="detail-value" id="spfValue"></div>
+                <div class="detail-rec" id="spfRec"></div>
+            </div>
+
+            <div class="detail-card" id="dmarcCard">
+                <div class="detail-header">
+                    <span class="detail-icon">🛡️</span>
+                    <span class="detail-title">DMARC</span>
+                    <span class="detail-status" id="dmarcStatus"></span>
+                </div>
+                <div class="detail-value" id="dmarcValue"></div>
+                <div class="detail-rec" id="dmarcRec"></div>
+            </div>
+
+            <div class="detail-card" id="mxCard">
+                <div class="detail-header">
+                    <span class="detail-icon">📬</span>
+                    <span class="detail-title">MX (Servidores)</span>
+                    <span class="detail-status" id="mxStatus"></span>
+                </div>
+                <div class="detail-value" id="mxValue"></div>
+                <div class="detail-rec" id="mxRec"></div>
+            </div>
+        </div>
+
+        <!-- Business Impact -->
+        <div class="impact-card" id="impactCard">
+            <h3>⚠️ Impacto no Negócio</h3>
+            <div class="impact-text" id="impactText"></div>
+        </div>
+
+        <!-- CTA -->
+        <div class="cta-card">
+            <h3>Proteja seu domínio agora.</h3>
+            <p>A Casco Digital configura SPF, DMARC e MX com política <strong>p=reject</strong> — o padrão máximo. Elimine o risco em 24h.</p>
+            <a href="https://wa.me/5551992413388?text=Ol%C3%A1%2C%20fiz%20a%20auditoria%20no%20The%20Guardian%20e%20gostaria%20de%20proteger%20meu%20dom%C3%ADnio." class="cta-button" target="_blank">
+                Falar com Especialista no WhatsApp
+            </a>
+        </div>
+
+    </div>
+
+    <!-- How it works -->
+    <section class="how-section">
+        <h2>Como <span>funciona</span>?</h2>
+        <div class="how-grid">
+            <div class="how-card">
+                <div class="how-icon">🔍</div>
+                <h4>SPF</h4>
+                <p>Define quais servidores podem enviar emails pelo seu domínio. Sem SPF, qualquer um pode se passar por você.</p>
+            </div>
+            <div class="how-card">
+                <div class="how-icon">🛡️</div>
+                <h4>DMARC</h4>
+                <p>Instrui provedores a rejeitar ou quarentenar emails que falhem nas verificações. O escudo final contra spoofing.</p>
+            </div>
+            <div class="how-card">
+                <div class="how-icon">📬</div>
+                <h4>MX</h4>
+                <p>Registros que apontam para seus servidores de email. Ausência indica configuração incorreta ou ausência de email corporativo.</p>
+            </div>
+            <div class="how-card">
+                <div class="how-icon">📊</div>
+                <h4>Score 0–100</h4>
+                <p>Calculado com base nas falhas encontradas. Quanto maior o score, maior o risco de fraude e prejuízo ao negócio.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 Casco Digital Informática. Todos os direitos reservados.</p>
+        <p style="margin-top: 0.5rem;">
+            <a href="/">Voltar ao site</a> |
+            <a href="https://wa.me/5551992413388" target="_blank">WhatsApp</a>
+        </p>
+        <p style="font-size: 0.8rem; margin-top: 0.75rem;">Desenvolvido com 🐢 e tecnologia cyberpunk.</p>
+    </footer>
+
+    <script>
+        // Mobile menu
+        document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+            document.getElementById('navMenu').classList.toggle('active');
+        });
+
+        const SCORE_COLORS = {
+            low:      { color: '#00FF00', glow: 'rgba(0,255,0,0.4)',    verdict: 'Baixo Risco — Boa configuração!' },
+            medium:   { color: '#FFC107', glow: 'rgba(255,193,7,0.4)',  verdict: 'Risco Moderado — Atenção necessária' },
+            high:     { color: '#FF9800', glow: 'rgba(255,152,0,0.4)',  verdict: 'Alto Risco — Ação recomendada' },
+            critical: { color: '#FF5252', glow: 'rgba(255,82,82,0.4)',  verdict: 'Risco Crítico — Domínio vulnerável!' },
+        };
+
+        function scoreLevel(s) {
+            if (s <= 20) return 'low';
+            if (s <= 50) return 'medium';
+            if (s <= 75) return 'high';
+            return 'critical';
+        }
+
+        const SPF_RECS = {
+            missing:    'Nenhum registro SPF encontrado. Qualquer servidor do mundo pode enviar emails no nome do seu domínio.',
+            dangerous:  'SPF com "+all" é extremamente perigoso — autoriza todos os servidores. Remova imediatamente.',
+            weak:       'SPF com "?all" não bloqueia nada. Troque para "-all" para proteção real.',
+            softfail:   'SPF com "~all" é softfail — emails suspeitos são aceitos com flag. Ideal: migrar para "-all".',
+            strict:     'SPF com "-all" está correto. Servidores não autorizados são rejeitados.',
+            incomplete: 'SPF existe mas não define política final. Adicione "-all" ao final do registro.',
+        };
+
+        const DMARC_RECS = {
+            missing:    'Sem DMARC, provedores não sabem o que fazer com emails suspeitos. Risco alto de spoofing e phishing.',
+            monitoring: 'DMARC com "p=none" apenas monitora — não bloqueia fraudes. Evolua para "p=quarantine" ou "p=reject".',
+            moderate:   'DMARC com "p=quarantine" envia suspeitos para spam. Bom, mas "p=reject" é o padrão de excelência.',
+            strict:     'DMARC com "p=reject" é o padrão máximo. Emails fraudulentos são bloqueados na fonte.',
+            incomplete: 'DMARC existe mas está incompleto. Verifique a política definida.',
+        };
+
+        function statusClass(s) {
+            if (['strict', 'ok'].includes(s)) return 'status-ok';
+            if (['softfail', 'moderate', 'monitoring', 'incomplete'].includes(s)) return 'status-warn';
+            return 'status-bad';
+        }
+
+        function impactText(score) {
+            if (score <= 20) return 'Seu domínio está bem protegido contra fraudes de email. Mantenha as configurações atualizadas e monitore relatórios DMARC regularmente.';
+            if (score <= 50) return 'Existem brechas que podem ser exploradas. Concorrentes ou criminosos podem tentar enviar emails no nome da sua empresa para clientes, fornecedores ou colaboradores. Risco de fraude financeira moderado.';
+            if (score <= 75) return '⚠️ Seu domínio está vulnerável. Criminosos podem enviar boletos falsos, solicitações de transferência e phishing corporativo com o endereço da sua empresa. Clientes podem ser enganados com emails aparentemente legítimos. Prejuízo financeiro e dano à reputação são riscos reais.';
+            return '🚨 CRÍTICO: Seu domínio não tem nenhuma proteção contra spoofing de email. Qualquer pessoa no mundo pode enviar emails como se fosse você agora mesmo — sem nenhum bloqueio técnico. Isso é usado em golpes financeiros, phishing direcionado e BEC (Business Email Compromise), os ataques que mais causam prejuízo a empresas brasileiras. Ação imediata necessária.';
+        }
+
+        async function runAudit(domain) {
+            const loading = document.getElementById('loadingSpinner');
+            const results = document.getElementById('resultsSection');
+            const errorBox = document.getElementById('errorBox');
+            const btn = document.getElementById('auditBtn');
+
+            errorBox.style.display = 'none';
+            results.classList.remove('visible');
+            loading.style.display = 'block';
+            btn.disabled = true;
+            btn.textContent = 'Auditando...';
+
+            try {
+                const res = await fetch(`/api/audit?domain=${encodeURIComponent(domain)}`);
+                const data = await res.json();
+
+                loading.style.display = 'none';
+
+                if (!data.ok) {
+                    errorBox.textContent = data.error || 'Erro ao auditar domínio.';
+                    errorBox.style.display = 'block';
+                    return;
+                }
+
+                renderResults(data);
+            } catch (e) {
+                loading.style.display = 'none';
+                errorBox.textContent = 'Falha na conexão. Tente novamente.';
+                errorBox.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Auditar Agora';
+            }
+        }
+
+        function renderResults(data) {
+            const { domain, score, spf, dmarc, mx } = data;
+            const level = scoreLevel(score);
+            const theme = SCORE_COLORS[level];
+
+            // Score card
+            const card = document.getElementById('scoreCard');
+            card.style.setProperty('--score-color', theme.color);
+            card.style.setProperty('--score-glow', theme.glow);
+
+            document.getElementById('scoreDomain').textContent = domain;
+            document.getElementById('scoreNumber').textContent = score;
+            document.getElementById('scoreVerdict').textContent = theme.verdict;
+
+            const bar = document.getElementById('scoreBar');
+            bar.style.width = '0%';
+            bar.style.background = theme.color;
+            bar.style.boxShadow = `0 0 10px ${theme.glow}`;
+            setTimeout(() => { bar.style.width = score + '%'; }, 50);
+
+            // SPF
+            const spfStatusEl = document.getElementById('spfStatus');
+            spfStatusEl.textContent = spf.label;
+            spfStatusEl.className = 'detail-status ' + statusClass(spf.status);
+            document.getElementById('spfValue').textContent = spf.value || '— não encontrado —';
+            document.getElementById('spfRec').textContent = SPF_RECS[spf.status] || '';
+
+            // DMARC
+            const dmarcStatusEl = document.getElementById('dmarcStatus');
+            dmarcStatusEl.textContent = dmarc.label;
+            dmarcStatusEl.className = 'detail-status ' + statusClass(dmarc.status);
+            document.getElementById('dmarcValue').textContent = dmarc.value || '— não encontrado —';
+            document.getElementById('dmarcRec').textContent = DMARC_RECS[dmarc.status] || '';
+
+            // MX
+            const mxStatusEl = document.getElementById('mxStatus');
+            if (mx.exists) {
+                mxStatusEl.textContent = `${mx.records.length} servidor(es)`;
+                mxStatusEl.className = 'detail-status status-ok';
+                document.getElementById('mxValue').textContent = mx.records.join('\n');
+                document.getElementById('mxRec').textContent = 'Servidores de email configurados corretamente.';
+            } else {
+                mxStatusEl.textContent = 'Ausente';
+                mxStatusEl.className = 'detail-status status-bad';
+                document.getElementById('mxValue').textContent = '— nenhum registro MX —';
+                document.getElementById('mxRec').textContent = 'Nenhum servidor de email encontrado. O domínio pode não ter email corporativo configurado.';
+            }
+
+            // Impact
+            document.getElementById('impactText').textContent = impactText(score);
+
+            // Show
+            document.getElementById('resultsSection').classList.add('visible');
+            document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        document.getElementById('auditForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const domain = document.getElementById('domainInput').value.trim();
+            if (!domain) return;
+            runAudit(domain);
+        });
+    </script>
+</body>
+</html>

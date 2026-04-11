@@ -1456,38 +1456,40 @@
         setTimeout(() => { bar.style.width = total + '%'; }, 50);
 
         // Impact & CTA
-        if (total < 60) {
-            const impactCard = document.getElementById('pcImpactCard');
+        const impactCard = document.getElementById('pcImpactCard');
+        let ctaTitle, ctaText, ctaMsg;
+
+        if (total >= 80 && cpuScore >= 25) {
+            impactCard.style.display = 'none';
+            ctaTitle = 'Máquina em conformidade.';
+            ctaText = 'Este equipamento atende aos requisitos do escritório moderno. Mantenha a manutenção e a segurança preventiva em dia.';
+            ctaMsg = 'Ol%C3%A1%2C%20fiz%20o%20diagn%C3%B3stico%20executivo%20e%20meu%20PC%20est%C3%A1%20em%20conformidade.%20Gostaria%20de%20saber%20sobre%20gest%C3%A3o%20e%20seguran%C3%A7a.';
+        } else {
             impactCard.style.display = 'block';
-            let impact = '';
             const problems = [];
-            if (diskScore <= 6)  problems.push('HD mecânico causando lentidão geral');
-            if (ramScore <= 10)  problems.push('RAM insuficiente para aplicações modernas');
-            if (cpuScore <= 15)  problems.push('CPU lenta para multitarefa e videoconferências');
-            impact = 'Problemas identificados: ' + problems.join('; ') + '. ';
-            if (diskScore <= 6) {
-                impact += 'O HD mecânico é prioritário — trocar por SSD resolve ~70% da lentidão percebida no dia a dia.';
+            if (diskScore <= 6)  problems.push('Armazenamento lento (HD mecânico)');
+            if (ramScore <= 10)  problems.push('Memória RAM insuficiente');
+            if (cpuScore <= 15)  problems.push('Processador defasado');
+
+            let impact = 'Gargalos identificados: ' + problems.join(', ') + '. ';
+
+            // Lógica de Veredito Executivo: Substituir vs Upgrade guiada pela CPU
+            if (cpuScore <= 15) {
+                // CPU ruim = Substituir
+                impact += 'O processador atual apresenta gargalo severo. Equipamentos com essa idade costumam ter arquitetura antiga, o que inviabiliza melhorias isoladas.';
+                ctaTitle = 'Substituição Recomendada';
+                ctaText = 'Não recomendamos investir em upgrades (RAM/SSD) nesta máquina. O investimento estratégico para o negócio é planejar a troca do equipamento.';
+                ctaMsg = 'Ol%C3%A1%2C%20fiz%20o%20diagn%C3%B3stico%20e%20a%20recomenda%C3%A7%C3%A3o%20foi%20substituir%20meu%20PC%20antigo.%20Gostaria%20de%20uma%20cota%C3%A7%C3%A3o.';
             } else {
-                impact += 'A combinação de componentes abaixo do recomendado impacta diretamente a produtividade e pode gerar frustração constante.';
+                // CPU ok = Upgrade viável
+                impact += 'O processador ainda apresenta capacidade de processamento aceitável. Resolver a falta de RAM ou lentidão de Disco pode estender a vida útil da máquina.';
+                ctaTitle = 'Upgrade Estratégico Viável';
+                ctaText = 'Um upgrade pontual de SSD ou RAM melhorará a performance por uma fração do preço de um PC novo (sujeito à compatibilidade da placa-mãe).';
+                ctaMsg = 'Ol%C3%A1%2C%20fiz%20o%20diagn%C3%B3stico%20e%20meu%20PC%20%C3%A9%20um%20bom%20candidato%20para%20upgrade%20de%20RAM/SSD.%20Podemos%20avaliar%3F';
             }
             document.getElementById('pcImpactText').textContent = impact;
         }
 
-        // CTA customization
-        let ctaTitle, ctaText, ctaMsg;
-        if (total >= 80) {
-            ctaTitle = 'Seu PC está em boa forma.';
-            ctaText = 'Mas manutenção preventiva, segurança e suporte profissional fazem diferença no longo prazo.';
-            ctaMsg = 'Ol%C3%A1%2C%20fiz%20o%20diagn%C3%B3stico%20no%20The%20Lab%20e%20meu%20PC%20passou.%20Quero%20saber%20sobre%20suporte%20e%20seguran%C3%A7a.';
-        } else if (diskScore <= 6) {
-            ctaTitle = 'Troque o HD por SSD.';
-            ctaText = 'É o upgrade com melhor custo-benefício do mercado. A Casco Digital indica, fornece e instala.';
-            ctaMsg = 'Ol%C3%A1%2C%20fiz%20o%20diagn%C3%B3stico%20no%20The%20Lab%20e%20meu%20PC%20tem%20HD%20mec%C3%A2nico.%20Quero%20trocar%20por%20SSD.';
-        } else {
-            ctaTitle = 'Hora de modernizar.';
-            ctaText = 'A Casco Digital avalia, indica e implementa a solução certa para o seu negócio — sem achismo.';
-            ctaMsg = 'Ol%C3%A1%2C%20fiz%20o%20diagn%C3%B3stico%20no%20The%20Lab%20e%20meu%20PC%20precisa%20de%20upgrade.%20Podem%20me%20ajudar%3F';
-        }
         document.getElementById('pcCtaTitle').textContent = ctaTitle;
         document.getElementById('pcCtaText').textContent = ctaText;
         document.getElementById('pcCtaBtn').href = `https://wa.me/5551992413388?text=${ctaMsg}`;

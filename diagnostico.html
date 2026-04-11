@@ -1406,15 +1406,15 @@
             gpuRec = 'WebGL não disponível. Não foi possível identificar a GPU.';
         } else if (gpu.tier === 'high') {
             gpuLabel = 'Dedicada'; gpuClass = 'status-ok';
-            gpuRec = 'GPU dedicada de alta performance. Suporta múltiplos monitores, videoconferências em 4K e aplicações gráficas profissionais.';
+            gpuRec = 'GPU dedicada de alta performance. Pronta para renderização, edição e múltiplos monitores 4K sem esforço.';
         } else if (gpu.tier === 'mid') {
             gpuLabel = 'Integrada OK'; gpuClass = 'status-ok';
-            gpuRec = 'GPU integrada moderna. Adequada para escritório, Teams e múltiplos monitores em resolução padrão.';
+            gpuRec = 'GPU integrada detectada. Atende perfeitamente às demandas de escritório, pacote Office e navegação web.';
         } else {
-            gpuLabel = 'Básica'; gpuClass = 'status-warn';
-            gpuRec = 'GPU integrada de geração antiga. Pode ter dificuldades com múltiplos monitores em alta resolução ou videoconferências simultâneas.';
+            gpuLabel = 'Básica'; gpuClass = 'status-ok';
+            gpuRec = 'GPU básica detectada. Suficiente para rotinas padrão de escritório e e-mails.';
         }
-        setStep('stepGpu', gpuScore >= 7 ? 'done' : 'warn', gpu.tier === 'unknown' ? 'N/D' : gpu.tier);
+        setStep('stepGpu', gpuScore >= 7 ? 'done' : 'done', gpu.tier === 'unknown' ? 'N/D' : gpu.tier);
 
         // ── FINAL SCORE
         const total = cpuScore + ramScore + diskScore + gpuScore;

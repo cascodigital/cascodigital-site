@@ -286,6 +286,7 @@
             padding: 1.5rem;
             backdrop-filter: blur(10px);
             transition: all 0.3s ease;
+            overflow: hidden;
         }
 
         .detail-card:hover {
@@ -307,6 +308,8 @@
             text-transform: uppercase;
             letter-spacing: 2px;
             color: #A0A0A0;
+            min-width: 0;
+            flex-shrink: 1;
         }
 
         .detail-status {
@@ -526,15 +529,15 @@
                 </a>
             </div>
             <div class="nav-center">
-                <a href="/" class="brand-name">CASCO DIGITAL</a>
+                <a href="index.html" class="brand-name">CASCO DIGITAL</a>
             </div>
             <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
             <ul id="navMenu" class="nav-right">
-                <li><a href="/">Home</a></li>
-                <li><a href="/#pillars">Pilares</a></li>
-                <li><a href="/#services">Serviços</a></li>
-                <li><a href="/guardian" class="active">The Guardian</a></li>
-                <li><a href="/#contact">Contato</a></li>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="index.html#pillars">Pilares</a></li>
+                <li><a href="index.html#services">Serviços</a></li>
+                <li><a href="guardian.html" class="active">The Guardian</a></li>
+                <li><a href="index.html#contact">Contato</a></li>
             </ul>
         </nav>
     </header>
@@ -575,7 +578,7 @@
         <!-- Score Card -->
         <div class="score-card" id="scoreCard">
             <div class="score-domain" id="scoreDomain"></div>
-            <div class="score-label">Score de Risco</div>
+            <div class="score-label">Nível de Proteção</div>
             <div class="score-number" id="scoreNumber">0</div>
             <div class="score-bar-wrapper">
                 <div class="score-bar" id="scoreBar" style="width: 0%"></div>
@@ -608,7 +611,7 @@
             <div class="detail-card" id="mxCard">
                 <div class="detail-header">
                     <span class="detail-icon">📬</span>
-                    <span class="detail-title">MX (Servidores)</span>
+                    <span class="detail-title">MX</span>
                     <span class="detail-status" id="mxStatus"></span>
                 </div>
                 <div class="detail-value" id="mxValue"></div>
@@ -664,7 +667,7 @@
     <footer>
         <p>&copy; 2024 Casco Digital Informática. Todos os direitos reservados.</p>
         <p style="margin-top: 0.5rem;">
-            <a href="/">Voltar ao site</a> |
+            <a href="index.html">Voltar ao site</a> |
             <a href="https://wa.me/5551992413388" target="_blank">WhatsApp</a>
         </p>
         <p style="font-size: 0.8rem; margin-top: 0.75rem;">Desenvolvido com 🐢 e tecnologia cyberpunk.</p>
@@ -677,16 +680,16 @@
         });
 
         const SCORE_COLORS = {
-            low:      { color: '#00FF00', glow: 'rgba(0,255,0,0.4)',    verdict: 'Baixo Risco — Boa configuração!' },
-            medium:   { color: '#FFC107', glow: 'rgba(255,193,7,0.4)',  verdict: 'Risco Moderado — Atenção necessária' },
-            high:     { color: '#FF9800', glow: 'rgba(255,152,0,0.4)',  verdict: 'Alto Risco — Ação recomendada' },
-            critical: { color: '#FF5252', glow: 'rgba(255,82,82,0.4)',  verdict: 'Risco Crítico — Domínio vulnerável!' },
+            low:      { color: '#00FF00', glow: 'rgba(0,255,0,0.4)',    verdict: 'Excelente — Domínio Protegido!' },
+            medium:   { color: '#FFC107', glow: 'rgba(255,193,7,0.4)',  verdict: 'Segurança Moderada — Existem brechas' },
+            high:     { color: '#FF9800', glow: 'rgba(255,152,0,0.4)',  verdict: 'Segurança Baixa — Ação recomendada' },
+            critical: { color: '#FF5252', glow: 'rgba(255,82,82,0.4)',  verdict: 'Risco Crítico — Vulnerável a ataques!' },
         };
 
         function scoreLevel(s) {
-            if (s <= 20) return 'low';
-            if (s <= 50) return 'medium';
-            if (s <= 75) return 'high';
+            if (s >= 90) return 'low';
+            if (s >= 70) return 'medium';
+            if (s >= 50) return 'high';
             return 'critical';
         }
 
@@ -714,9 +717,9 @@
         }
 
         function impactText(score) {
-            if (score <= 20) return 'Seu domínio está bem protegido contra fraudes de email. Mantenha as configurações atualizadas e monitore relatórios DMARC regularmente.';
-            if (score <= 50) return 'Existem brechas que podem ser exploradas. Concorrentes ou criminosos podem tentar enviar emails no nome da sua empresa para clientes, fornecedores ou colaboradores. Risco de fraude financeira moderado.';
-            if (score <= 75) return '⚠️ Seu domínio está vulnerável. Criminosos podem enviar boletos falsos, solicitações de transferência e phishing corporativo com o endereço da sua empresa. Clientes podem ser enganados com emails aparentemente legítimos. Prejuízo financeiro e dano à reputação são riscos reais.';
+            if (score >= 90) return 'Seu domínio está bem protegido contra fraudes de email. Mantenha as configurações atualizadas e monitore relatórios DMARC regularmente.';
+            if (score >= 70) return 'Existem brechas que podem ser exploradas. Concorrentes ou criminosos podem tentar enviar emails no nome da sua empresa para clientes, fornecedores ou colaboradores. Risco de fraude financeira moderado.';
+            if (score >= 50) return '⚠️ Seu domínio está vulnerável. Criminosos podem enviar boletos falsos, solicitações de transferência e phishing corporativo com o endereço da sua empresa. Clientes podem ser enganados com emails aparentemente legítimos. Prejuízo financeiro e dano à reputação são riscos reais.';
             return '🚨 CRÍTICO: Seu domínio não tem nenhuma proteção contra spoofing de email. Qualquer pessoa no mundo pode enviar emails como se fosse você agora mesmo — sem nenhum bloqueio técnico. Isso é usado em golpes financeiros, phishing direcionado e BEC (Business Email Compromise), os ataques que mais causam prejuízo a empresas brasileiras. Ação imediata necessária.';
         }
 

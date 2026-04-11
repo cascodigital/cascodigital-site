@@ -1,0 +1,29 @@
+ESTRUTURA DE PASTAS PARA O REPOSITÓRIO
+========================================
+
+Organize os arquivos assim antes de fazer push para o Git:
+
+casco-digital-site/
+│
+├── index.html              ← Site principal (baixe este arquivo)
+│
+├── functions/              ← Crie esta pasta
+│   └── api/                ← Crie esta subpasta
+│       └── contact.js      ← Coloque o contact.js aqui
+│
+├── wrangler.toml           ← Config do Cloudflare (opcional)
+├── .gitignore              ← Ignorar arquivos
+└── README.md               ← Instruções completas
+
+IMPORTANTE:
+- O arquivo contact.js DEVE estar em functions/api/contact.js
+- O Cloudflare Pages detecta automaticamente essa estrutura
+- Cada arquivo em functions/ vira um endpoint serverless
+
+PRÓXIMOS PASSOS:
+1. Crie um repositório Git (GitHub, GitLab, etc.)
+2. Organize os arquivos nessa estrutura
+3. Faça push para o repositório
+4. Conecte no Cloudflare Pages
+5. Configure as variáveis de ambiente
+6. Deploy automático!

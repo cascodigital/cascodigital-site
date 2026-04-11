@@ -1,21 +1,8 @@
-/**
- * Cloudflare Pages Function - Formulario de Contato
- *
- * Endpoint POST /api/contact
- * Recebe dados do formulario (name, email, phone, message) e envia dois emails
- * via Resend: notificacao interna + confirmacao para o cliente.
- *
- * Env vars: EMAIL_FROM, EMAIL_TO, EMAIL_API_URL, EMAIL_API_KEY
- *
- * @param {Object} context - Cloudflare Pages Function context (request, env)
- * @returns {Response} JSON { ok: true/false, error?: string }
- *
- * Autor: Andre Kittler / Casco Digital
- */
 export async function onRequestPost(context) {
   try {
     const { request, env } = context;
 
+    // Le body JSON
     const body = await request.json();
     const { name, email, phone, message } = body;
 
@@ -26,14 +13,19 @@ export async function onRequestPost(context) {
       );
     }
 
-    // EMAIL 1: Para a Casco Digital (interno)
-    const internalPayload = {
+    // ===== INTEGRACAO COM PROVEDOR DE EMAIL =====
+    // Este exemplo usa uma API HTTP generica
+    // Configure as variaveis de ambiente no Cloudflare Pages:
+    // - EMAIL_API_URL (ex: https://api.resend.com/emails)
+    // - EMAIL_API_KEY (sua chave de API)
+    // - EMAIL_FROM (ex: no-reply@cascodigital.com.br)
+    // - EMAIL_TO (ex: suporte@cascodigital.com.br)
+
+    const emailPayload = {
       from: env.EMAIL_FROM,
       to: env.EMAIL_TO,
       subject: "Novo contato - Site Casco Digital",
       text: `
-Novo contato recebido pelo site Casco Digital.
-
 Nome: ${name}
 Email: ${email}
 Telefone: ${phone || "-"}
@@ -43,63 +35,22 @@ ${message}
       `.trim(),
     };
 
-    const internalResp = await fetch(env.EMAIL_API_URL, {
+    const sendResponse = await fetch(env.EMAIL_API_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${env.EMAIL_API_KEY}`,
       },
-      body: JSON.stringify(internalPayload),
+      body: JSON.stringify(emailPayload),
     });
 
-    if (!internalResp.ok) {
-      const errText = await internalResp.text();
-      console.error("Erro ao enviar email interno:", errText);
+    if (!sendResponse.ok) {
+      const errorText = await sendResponse.text();
+      console.error("Erro ao enviar email:", errorText);
       return new Response(
-        JSON.stringify({ ok: false, error: "Falha ao notificar equipe." }),
+        JSON.stringify({ ok: false, error: "Falha ao enviar email." }),
         { status: 500, headers: { "Content-Type": "application/json" } }
       );
-    }
-
-    // EMAIL 2: Confirmacao para o cliente (externo)
-    const clientPayload = {
-      from: env.EMAIL_FROM,
-      to: email,
-      subject: "Recebemos sua mensagem - Casco Digital",
-      text: `
-Olá ${name},
-
-Recebemos sua mensagem enviada pelo site da Casco Digital e já estamos analisando.
-
-Resumo do que você enviou:
-
-Nome: ${name}
-Email: ${email}
-Telefone: ${phone || "-"}
-
-Mensagem:
-${message}
-
-Em breve entraremos em contato.
-
-Casco Digital
-Consultoria em M365, PowerShell e Infraestrutura
-      `.trim(),
-    };
-
-    const clientResp = await fetch(env.EMAIL_API_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${env.EMAIL_API_KEY}`,
-      },
-      body: JSON.stringify(clientPayload),
-    });
-
-    if (!clientResp.ok) {
-      const errText = await clientResp.text();
-      console.error("Erro ao enviar email para o cliente:", errText);
-      // Nao quebra a requisicao para o front, so loga o erro
     }
 
     return new Response(JSON.stringify({ ok: true }), {

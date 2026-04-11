@@ -1,62 +1,146 @@
-# Casco Digital — Site Institucional
+# Casco Digital - Site com Formulário de Contato
 
-![Status](https://img.shields.io/badge/Status-Active-brightgreen)
-![License](https://img.shields.io/badge/License-MIT-blue)
-![Author](https://img.shields.io/badge/Author-Casco%20Digital-orange)
+Site institucional da Casco Digital com formulário de contato funcional usando Cloudflare Pages Functions.
 
-![Cloudflare](https://img.shields.io/badge/Cloudflare-Pages-F38020?style=flat-square&logo=cloudflare&logoColor=white)
-![HTML5](https://img.shields.io/badge/HTML5-CSS3-E34F26?style=flat-square&logo=html5&logoColor=white)
-![Resend](https://img.shields.io/badge/Email-Resend-00D9FF?style=flat-square)
-
-Site institucional da Casco Digital com formulario de contato funcional. Deploy automatico via Cloudflare Pages, envio de emails via Resend.
-
-**Producao:** [cascodigital.com.br](https://cascodigital.com.br)
-
-## Estrutura
+## Estrutura de Arquivos
 
 ```
-cascodigital-site/
-├── index.html              # Pagina principal
-├── assets/images/          # Imagens do site
-├── functions/api/
-│   └── contact.js          # Serverless function (Cloudflare Pages)
-└── README.md
+casco-digital-site/
+├── index.html              # Página principal do site
+├── functions/
+│   └── api/
+│       └── contact.js      # Endpoint POST /api/contact (serverless)
+├── wrangler.toml           # Config do Cloudflare
+└── README.md               # Este arquivo
 ```
 
-## Formulario de Contato
+## Funcionalidades
 
-O endpoint `POST /api/contact` (Cloudflare Pages Function) envia dois emails via Resend:
-- Notificacao interna para a Casco Digital
-- Confirmacao automatica para o cliente
+✓ Design responsivo moderno
+✓ Navbar com links rápidos (Suporte Remoto, Portal de Chamados)
+✓ Formulário de contato funcional com validação
+✓ Backend serverless (Cloudflare Pages Functions)
+✓ Envio de email via API HTTP (Resend, SMTP-as-API, etc.)
 
-## Deploy
+## Setup - Cloudflare Pages (GRÁTIS)
 
-### Cloudflare Pages
+### 1. Preparar o repositório
 
-1. Conecte este repositorio em **Cloudflare Pages** > **Create a project** > **Connect to Git**
-2. Configuracao de build:
-   - Framework preset: **None**
-   - Build command: (vazio)
-   - Build output directory: `/`
+Crie um repositório Git com esta estrutura:
 
-### Variaveis de Ambiente
+```
+meu-repo/
+├── index.html
+└── functions/
+    └── api/
+        └── contact.js
+```
 
-Configure em **Settings** > **Variables and Secrets** > **Production**:
+Coloque o arquivo `index.html` na raiz e `contact.js` dentro de `functions/api/`.
 
-| Variavel | Tipo | Valor |
-|----------|------|-------|
-| `EMAIL_API_KEY` | Secret | API Key do Resend (`re_...`) |
-| `EMAIL_API_URL` | Text | `https://api.resend.com/emails` |
-| `EMAIL_FROM` | Text | Remetente verificado no Resend |
-| `EMAIL_TO` | Text | Email que recebe os contatos |
+### 2. Criar projeto no Cloudflare Pages
 
-Apos configurar, faca um **Retry deployment** no ultimo deploy.
+1. Acesse https://dash.cloudflare.com/ e vá em **Pages**
+2. Clique em **Create a project** > **Connect to Git**
+3. Conecte seu repositório (GitHub/GitLab)
+4. Configure:
+   - **Build command**: deixe vazio
+   - **Build output directory**: `/`
+   - **Root directory**: `/`
 
-## Personalizacao
+### 3. Configurar variáveis de ambiente
 
-- **Destinatario:** altere `EMAIL_TO` nas variaveis de ambiente
-- **Templates de email:** edite `internalPayload` e `clientPayload` em `functions/api/contact.js`
+No dashboard do projeto Cloudflare Pages, vá em **Settings** > **Environment variables** e adicione:
+
+| Variável        | Valor (exemplo)                      |
+|----------------|--------------------------------------|
+| `EMAIL_API_URL` | `https://api.resend.com/emails`     |
+| `EMAIL_API_KEY` | Sua chave de API do provedor        |
+| `EMAIL_FROM`   | `no-reply@cascodigital.com.br`      |
+| `EMAIL_TO`     | `suporte@cascodigital.com.br`       |
+
+### 4. Escolher provedor de email
+
+O endpoint `functions/api/contact.js` usa uma API HTTP genérica para enviar emails.
+
+#### Opção 1: Resend (Recomendado)
+
+1. Crie conta grátis em https://resend.com
+2. Gere uma API Key
+3. Configure:
+   - `EMAIL_API_URL`: `https://api.resend.com/emails`
+   - `EMAIL_API_KEY`: Sua chave
+   - `EMAIL_FROM`: Email verificado no Resend
+   - `EMAIL_TO`: Seu email de destino
+
+Documentação: https://resend.com/docs/send-with-cloudflare-workers
+
+#### Opção 2: Outro provedor SMTP-as-API
+
+Ajuste o código em `functions/api/contact.js` conforme a API do provedor escolhido:
+- Mailgun
+- SendGrid
+- Postmark
+- Etc.
+
+### 5. Deploy
+
+Faça push para o repositório Git. Cloudflare Pages vai automaticamente:
+- Fazer deploy do `index.html`
+- Expor a função em `/api/contact`
+
+O site estará disponível em `https://seu-projeto.pages.dev`
+
+## Desenvolvimento Local (Opcional)
+
+### Requisitos
+- Node.js 18+
+- npm ou pnpm
+
+### Instalar Wrangler
+```bash
+npm install -g wrangler
+```
+
+### Configurar variaveis locais
+Edite `wrangler.toml` com suas credenciais de desenvolvimento.
+
+### Rodar localmente
+```bash
+wrangler pages dev .
+```
+
+Acesse http://localhost:8788
+
+## Personalização
+
+### Alterar emails de destino
+
+Edite a variável `EMAIL_TO` no Cloudflare Pages dashboard.
+
+### Adicionar mais campos no formulário
+
+1. Adicione os campos no HTML (`index.html`)
+2. Capture-os no JavaScript (já está usando `FormData`)
+3. Ajuste o template de email em `functions/api/contact.js`
+
+### Mudar o estilo
+
+Edite o CSS inline no `<style>` de `index.html`.
+
+## Suporte
+
+- Cloudflare Pages: https://developers.cloudflare.com/pages
+- Resend: https://resend.com/docs
+- Problemas: verifique os logs no dashboard Cloudflare Pages > Functions
+
+## Tecnologias
+
+- HTML5, CSS3, JavaScript (ES6+)
+- Cloudflare Pages Functions (serverless)
+- API HTTP para envio de email
 
 ---
 
-Desenvolvido com 🐢 (e cafe) por **Casco Digital**.
+**Casco Digital**
+suporte@cascodigital.com.br

@@ -1,0 +1,32 @@
+REPO GIT - O QUE SUBIR
+============================
+
+Pastas/arquivos no git (raiz do repo):
+
+- index.html
+- functions/           (pasta)
+    - api/            (subpasta)
+        - contact.js
+- wrangler-public.toml
+- README.md
+- .gitignore
+- assets/              (se existir)
+    - images/         (coloque aqui as imagens usadas no HTML)
+
+NAO SUBIR (ou manter fora de segredo):
+- wrangler.toml com API keys reais (use so local, opcional)
+- Qualquer arquivo .env com chaves
+
+CLOUDFLARE PAGES - PASSOS
+=========================
+
+1) Conectar o repo Git no Cloudflare Pages.
+2) Build command: deixar em branco.
+3) Build output directory: "/".
+4) Root directory: "/".
+5) Em Settings > Environment variables, criar:
+   - EMAIL_API_URL
+   - EMAIL_API_KEY
+   - EMAIL_FROM
+   - EMAIL_TO
+6) Deploy. O endpoint /api/contact vira da functions/api/contact.js.

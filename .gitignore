@@ -1,20 +1,18 @@
+# Wrangler
+.wrangler/
+wrangler.toml.bak
+
+# Logs
+*.log
+
+# Environment variables (nao commitar secrets)
+.env
+.env.local
+
 # OS
 .DS_Store
 Thumbs.db
-desktop.ini
 
-# IDE
+# Editor
 .vscode/
 .idea/
-*.swp
-*.swo
-*~
-
-# Node (caso adicione build tools no futuro)
-node_modules/
-dist/
-.cache/
-
-# Env
-.env
-.env.local

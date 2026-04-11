@@ -475,7 +475,12 @@
             min-height: 2.5rem;
         }
 
-        .detail-rec { font-size: 0.85rem; color: #E0E0E0; line-height: 1.5; }
+        .detail-rec {
+            font-size: 0.85rem;
+            color: #E0E0E0;
+            line-height: 1.5;
+            margin-top: auto;
+        }
 
         /* Impact */
         .impact-card {
@@ -622,16 +627,19 @@
         }
 
         .how-card {
+            display: flex;
+            flex-direction: column;
             background: rgba(26,31,58,0.6);
             border: 1px solid rgba(0,217,255,0.15);
             border-radius: 10px;
             padding: 1.5rem;
             text-align: center;
+            height: 100%;
         }
 
         .how-card .how-icon { font-size: 2rem; margin-bottom: 0.75rem; }
         .how-card h4 { color: #00D9FF; margin-bottom: 0.5rem; font-size: 0.95rem; }
-        .how-card p { font-size: 0.85rem; color: #A0A0A0; line-height: 1.5; }
+        .how-card p { font-size: 0.85rem; color: #A0A0A0; line-height: 1.5; margin-top: auto; }
 
         /* Footer */
         footer {

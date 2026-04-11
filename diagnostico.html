@@ -622,7 +622,7 @@
 
         .how-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(2, 1fr);
             gap: 1.5rem;
         }
 
@@ -1481,11 +1481,25 @@
                 ctaText = 'Não recomendamos investir em upgrades (RAM/SSD) nesta máquina. O investimento estratégico para o negócio é planejar a troca do equipamento.';
                 ctaMsg = 'Ol%C3%A1%2C%20fiz%20o%20diagn%C3%B3stico%20e%20a%20recomenda%C3%A7%C3%A3o%20foi%20substituir%20meu%20PC%20antigo.%20Gostaria%20de%20uma%20cota%C3%A7%C3%A3o.';
             } else {
-                // CPU ok = Upgrade viável
-                impact += 'O processador ainda apresenta capacidade de processamento aceitável. Resolver a falta de RAM ou lentidão de Disco pode estender a vida útil da máquina.';
-                ctaTitle = 'Upgrade Estratégico Viável';
-                ctaText = 'Um upgrade pontual de SSD ou RAM melhorará a performance por uma fração do preço de um PC novo (sujeito à compatibilidade da placa-mãe).';
-                ctaMsg = 'Ol%C3%A1%2C%20fiz%20o%20diagn%C3%B3stico%20e%20meu%20PC%20%C3%A9%20um%20bom%20candidato%20para%20upgrade%20de%20RAM/SSD.%20Podemos%20avaliar%3F';
+                // CPU ok = Upgrade viável. Agora checamos o que especificamente precisa de upgrade
+                impact += 'O processador ainda apresenta capacidade de processamento aceitável. O investimento ideal agora é focar nos gargalos periféricos.';
+                
+                if (diskScore <= 6 && ramScore > 10) {
+                    // Só o HD é ruim
+                    ctaTitle = 'Troque o HD por SSD';
+                    ctaText = 'O processador e a memória estão bons, mas o HD mecânico está ancorando a performance. Trocar por um SSD (caso a placa permita) resolve ~70% da lentidão.';
+                    ctaMsg = 'Ol%C3%A1%2C%20fiz%20o%20diagn%C3%B3stico%20e%20meu%20PC%20%C3%A9%20um%20bom%20candidato%20para%20colocar%20SSD.%20Podemos%20avaliar%3F';
+                } else if (ramScore <= 10 && diskScore > 6) {
+                    // Só a RAM é ruim
+                    ctaTitle = 'Aumente a Memória RAM';
+                    ctaText = 'O processador e o armazenamento (SSD) estão ótimos, mas a falta de memória causa travamentos. Um upgrade de RAM (se suportado) resolverá o problema.';
+                    ctaMsg = 'Ol%C3%A1%2C%20fiz%20o%20diagn%C3%B3stico%20e%20preciso%20aumentar%20a%20RAM%20do%20meu%20PC.%20Podemos%20avaliar%3F';
+                } else {
+                    // Ambos ruins
+                    ctaTitle = 'Upgrade de SSD e Memória';
+                    ctaText = 'Substituir o HD antigo por SSD e aumentar a memória trará vida nova à máquina. Bem mais barato que um PC novo (se a placa-mãe for expansível).';
+                    ctaMsg = 'Ol%C3%A1%2C%20fiz%20o%20diagn%C3%B3stico%20e%20meu%20PC%20precisa%20de%20SSD%20e%20RAM.%20Podemos%20avaliar%3F';
+                }
             }
             document.getElementById('pcImpactText').textContent = impact;
         }

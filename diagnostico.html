@@ -420,6 +420,11 @@
             margin-bottom: 2rem;
         }
 
+        /* Se houver apenas 3 cards, faz o último ocupar a linha toda para não parecer que tá faltando um */
+        .detail-grid:has(> .detail-card:nth-child(3):last-child) > .detail-card:nth-child(3) {
+            grid-column: 1 / -1;
+        }
+
         .detail-card {
             background: rgba(26,31,58,0.8);
             border: 1px solid rgba(0,217,255,0.2);
@@ -772,7 +777,7 @@
                 <div class="score-verdict" id="gScoreVerdict"></div>
             </div>
 
-            <div class="detail-grid">
+            <div class="guardian-grid">
                 <div class="detail-card">
                     <div class="detail-header">
                         <span class="detail-icon">📧</span>
@@ -1526,6 +1531,16 @@
     // Auto-switch how-tab when tool tab changes
     document.getElementById('tabBtnGuardian').addEventListener('click', () => switchHowTab('guardian'));
     document.getElementById('tabBtnPc').addEventListener('click', () => switchHowTab('pc'));
+    </script>
+</body>
+</html>
+
+').addEventListener('click', () => switchHowTab('pc'));
+    </script>
+</body>
+</html>
+
+ab('pc'));
     </script>
 </body>
 </html>

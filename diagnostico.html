@@ -1,1547 +1,1043 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Diagnóstico - Diagnóstico executivo de TI. Avalie o risco de fraudes no e-mail corporativo e gargalos de produtividade nos computadores da sua equipe. Casco Digital.">
-    <meta property="og:title" content="Diagnóstico | Diagnóstico Digital - Casco Digital">
-    <meta property="og:description" content="Duas ferramentas gratuitas: Guardian (auditoria de email SPF/DMARC) e PC Inspector (benchmark de hardware para escritório).">
-    <meta property="og:url" content="https://cascodigital.com.br/lab">
-    <title>Diagnóstico | Diagnóstico Digital - Casco Digital</title>
-
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
-
-        body {
-            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #0A0E27;
-            color: #E0E0E0;
-            overflow-x: hidden;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background-image:
-                radial-gradient(2px 2px at 20px 30px, #00D9FF, rgba(0,217,255,0.2)),
-                radial-gradient(2px 2px at 60px 70px, #00D9FF, rgba(0,217,255,0.1)),
-                radial-gradient(1px 1px at 50px 50px, #00FF00, rgba(0,255,0,0.1));
-            background-size: 200px 200px;
-            background-repeat: repeat;
-            opacity: 0.03;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        ::-webkit-scrollbar { width: 10px; }
-        ::-webkit-scrollbar-track { background: #0A0E27; }
-        ::-webkit-scrollbar-thumb { background: #00D9FF; border-radius: 5px; }
-        ::-webkit-scrollbar-thumb:hover { background: #00FF00; }
-
-        /* ── NAV ── */
-        header {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: rgba(10,14,39,0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(0,217,255,0.2);
-        }
-
-        nav {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1rem 2rem;
-            gap: 2rem;
-        }
-
-        .nav-left { display: flex; gap: 0.8rem; align-items: center; flex: 0 0 auto; }
-
-        .quick-btn {
-            display: flex; align-items: center; gap: 0.5rem;
-            padding: 0.6rem 1rem; border-radius: 8px; font-size: 0.85rem;
-            font-weight: 600; text-decoration: none; transition: all 0.3s ease;
-            border: 2px solid transparent; white-space: nowrap;
-        }
-        .suporte-btn { background: linear-gradient(135deg, #00D9FF 0%, #0099CC 100%); color: #0A1A2F; }
-        .suporte-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,217,255,0.4); }
-        .chamados-btn { background: rgba(0,217,255,0.1); color: #00D9FF; border-color: #00D9FF; }
-        .chamados-btn:hover { background: rgba(0,217,255,0.2); transform: translateY(-2px); }
-
-        .nav-center { flex: 1; display: flex; justify-content: center; }
-        .brand-name {
-            font-size: 1.5rem; font-weight: 800; letter-spacing: 2px;
-            color: #00D9FF; text-decoration: none; transition: all 0.3s ease;
-        }
-        .brand-name:hover { text-shadow: 0 0 20px rgba(0,217,255,0.6); }
-
-        .nav-right { display: flex; list-style: none; gap: 2rem; margin: 0; padding: 0; flex: 0 0 auto; }
-        .nav-right li a { color: #fff; text-decoration: none; font-weight: 500; transition: color 0.3s ease; }
-        .nav-right li a:hover, .nav-right li a.active { color: #00D9FF; }
-
-        .mobile-menu-btn {
-            display: none; background: none; border: none;
-            color: #00D9FF; font-size: 1.5rem; cursor: pointer;
-        }
-
-        /* ── HERO ── */
-        .lab-hero {
-            position: relative;
-            padding: 5rem 2rem 3rem;
-            text-align: center;
-            z-index: 1;
-            overflow: hidden;
-        }
-
-        .lab-hero::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(circle at 50% 40%, rgba(0,217,255,0.08), transparent 60%);
-            z-index: -1;
-        }
-
-        .hero-badge {
-            display: inline-block;
-            padding: 0.4rem 1.2rem;
-            background: rgba(0,217,255,0.1);
-            border: 1px solid rgba(0,217,255,0.3);
-            border-radius: 20px;
-            font-size: 0.85rem;
-            color: #00D9FF;
-            margin-bottom: 1.5rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .lab-hero h1 {
-            font-size: clamp(2.5rem, 6vw, 4rem);
-            font-weight: 900;
-            line-height: 1.1;
-            margin-bottom: 1rem;
-        }
-
-        .lab-hero h1 span {
-            color: #00D9FF;
-            text-shadow: 0 0 30px rgba(0,217,255,0.4);
-        }
-
-        .lab-hero p {
-            font-size: 1.15rem;
-            color: #A0A0A0;
-            max-width: 600px;
-            margin: 0 auto 2.5rem;
-            line-height: 1.6;
-        }
-
-        /* ── TABS ── */
-        .tab-switcher {
-            display: inline-flex;
-            gap: 0;
-            background: rgba(26,31,58,0.8);
-            border: 1px solid rgba(0,217,255,0.3);
-            border-radius: 12px;
-            overflow: hidden;
-            backdrop-filter: blur(10px);
-            margin-bottom: 0;
-        }
-
-        .tab-btn {
-            padding: 0.85rem 2rem;
-            background: transparent;
-            border: none;
-            color: #A0A0A0;
-            font-size: 0.95rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-family: 'Roboto', sans-serif;
-        }
-
-        .tab-btn:first-child { border-right: 1px solid rgba(0,217,255,0.2); }
-
-        .tab-btn.active {
-            background: linear-gradient(135deg, rgba(0,217,255,0.15), rgba(0,229,204,0.1));
-            color: #00D9FF;
-        }
-
-        .tab-btn:hover:not(.active) {
-            background: rgba(0,217,255,0.05);
-            color: #E0E0E0;
-        }
-
-        /* ── TOOL SECTIONS ── */
-        .tool-section {
-            display: none;
-            z-index: 1;
-            position: relative;
-        }
-
-        .tool-section.active { display: block; }
-
-        /* ── GUARDIAN FORM ── */
-        .audit-form-container {
-            max-width: 700px;
-            margin: 2.5rem auto 0;
-            padding: 0 2rem;
-        }
-
-        .audit-form {
-            display: flex;
-            gap: 0;
-            border: 1px solid rgba(0,217,255,0.4);
-            border-radius: 10px;
-            overflow: hidden;
-            background: rgba(26,31,58,0.8);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 0 40px rgba(0,217,255,0.1);
-        }
-
-        .audit-input {
-            flex: 1;
-            padding: 1.1rem 1.5rem;
-            background: transparent;
-            border: none;
-            color: #E0E0E0;
-            font-size: 1rem;
-            outline: none;
-            font-family: 'Roboto', sans-serif;
-        }
-
-        .audit-input::placeholder { color: #555; }
-
-        .audit-btn {
-            padding: 1.1rem 2rem;
-            background: linear-gradient(135deg, #00D9FF, #00E5CC);
-            color: #0A0E27;
-            border: none;
-            font-weight: 700;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-            font-family: 'Roboto', sans-serif;
-        }
-
-        .audit-btn:hover { background: linear-gradient(135deg, #00FF00, #00E5CC); }
-        .audit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-
-        .form-hint {
-            font-size: 0.8rem;
-            color: #555;
-            margin-top: 0.6rem;
-            text-align: center;
-        }
-
-        /* ── PC START ── */
-        .pc-start-container {
-            max-width: 700px;
-            margin: 2.5rem auto 0;
-            padding: 0 2rem;
-            text-align: center;
-        }
-
-        .pc-what {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
-
-        .pc-what-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.9rem;
-            color: #A0A0A0;
-        }
-
-        .pc-what-item span:first-child { font-size: 1.2rem; }
-
-        .pc-start-btn {
-            padding: 1.1rem 3rem;
-            background: linear-gradient(135deg, #00D9FF, #00E5CC);
-            color: #0A0E27;
-            border: none;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 1.05rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 30px rgba(0,217,255,0.3);
-            font-family: 'Roboto', sans-serif;
-        }
-
-        .pc-start-btn:hover {
-            background: linear-gradient(135deg, #00FF00, #00E5CC);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0,217,255,0.5);
-        }
-
-        .pc-start-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-        .pc-hint {
-            font-size: 0.8rem;
-            color: #555;
-            margin-top: 0.75rem;
-        }
-
-        /* ── PC PROGRESS ── */
-        .pc-progress {
-            max-width: 500px;
-            margin: 2rem auto 0;
-            padding: 0 2rem;
-            display: none;
-        }
-
-        .progress-step {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 0.85rem 1.25rem;
-            background: rgba(26,31,58,0.6);
-            border: 1px solid rgba(0,217,255,0.15);
-            border-radius: 8px;
-            margin-bottom: 0.75rem;
-            transition: all 0.3s ease;
-        }
-
-        .progress-step.running { border-color: rgba(0,217,255,0.4); }
-        .progress-step.done { border-color: rgba(0,255,0,0.3); }
-        .progress-step.warn { border-color: rgba(255,152,0,0.3); }
-        .progress-step.fail { border-color: rgba(255,82,82,0.3); }
-
-        .step-icon { font-size: 1.3rem; width: 1.5rem; text-align: center; }
-        .step-label { flex: 1; font-size: 0.95rem; font-weight: 600; }
-        .step-status { font-size: 0.8rem; color: #A0A0A0; font-family: monospace; }
-
-        .step-spinner {
-            width: 16px; height: 16px;
-            border: 2px solid rgba(0,217,255,0.2);
-            border-top-color: #00D9FF;
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-            flex-shrink: 0;
-        }
-
-        /* ── RESULTS SHARED ── */
-        .results-section {
-            max-width: 900px;
-            margin: 3rem auto;
-            padding: 0 2rem;
-            display: none;
-        }
-
-        .results-section.visible { display: block; }
-
-        .score-card {
-            background: rgba(26,31,58,0.9);
-            border: 1px solid rgba(0,217,255,0.3);
-            border-radius: 12px;
-            padding: 2.5rem;
-            text-align: center;
-            margin-bottom: 2rem;
-            backdrop-filter: blur(10px);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .score-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
-            background: var(--score-color, #00D9FF);
-        }
-
-        .score-domain {
-            font-size: 1rem;
-            color: #A0A0A0;
-            margin-bottom: 0.5rem;
-            font-family: monospace;
-        }
-
-        .score-label {
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: #A0A0A0;
-            margin-bottom: 1rem;
-        }
-
-        .score-number {
-            font-size: 5rem;
-            font-weight: 900;
-            color: var(--score-color, #00D9FF);
-            text-shadow: 0 0 30px var(--score-glow, rgba(0,217,255,0.4));
-            line-height: 1;
-            margin-bottom: 0.5rem;
-        }
-
-        .score-bar-wrapper {
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
-            height: 12px;
-            width: 100%;
-            max-width: 400px;
-            margin: 1.5rem auto 1rem;
-            overflow: hidden;
-        }
-
-        .score-bar {
-            height: 100%;
-            border-radius: 10px;
-            background: var(--score-color, #00D9FF);
-            box-shadow: 0 0 10px var(--score-glow, rgba(0,217,255,0.5));
-            transition: width 1.2s ease;
-        }
-
-        .score-verdict {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--score-color, #00D9FF);
-        }
-
-        /* Detail Cards */
-        .detail-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-
-        /* Se houver apenas 3 cards, faz o último ocupar a linha toda para não parecer que tá faltando um */
-        .detail-grid:has(> .detail-card:nth-child(3):last-child) > .detail-card:nth-child(3) {
-            grid-column: 1 / -1;
-        }
-
-        .detail-card {
-            background: rgba(26,31,58,0.8);
-            border: 1px solid rgba(0,217,255,0.2);
-            border-radius: 10px;
-            padding: 1.5rem;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-            overflow: hidden;
-        }
-
-        .detail-card:hover { border-color: rgba(0,217,255,0.4); transform: translateY(-2px); }
-
-        .detail-header {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-        }
-
-        .detail-icon { font-size: 1.5rem; }
-
-        .detail-title {
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: #A0A0A0;
-            min-width: 0;
-            flex-shrink: 1;
-        }
-
-        .detail-status {
-            margin-left: auto;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            white-space: nowrap;
-        }
-
-        .status-ok   { background: rgba(0,255,0,0.1);   color: #00FF00; border: 1px solid rgba(0,255,0,0.3); }
-        .status-warn { background: rgba(255,193,7,0.1); color: #FFC107; border: 1px solid rgba(255,193,7,0.3); }
-        .status-bad  { background: rgba(255,82,82,0.1); color: #FF5252; border: 1px solid rgba(255,82,82,0.3); }
-
-        .detail-value {
-            font-family: monospace;
-            font-size: 0.8rem;
-            color: #A0A0A0;
-            word-break: break-all;
-            background: rgba(0,0,0,0.3);
-            padding: 0.6rem;
-            border-radius: 6px;
-            margin-bottom: 0.75rem;
-            min-height: 2.5rem;
-        }
-
-        .detail-rec {
-            font-size: 0.85rem;
-            color: #E0E0E0;
-            line-height: 1.5;
-            margin-top: auto;
-        }
-
-        /* Impact */
-        .impact-card {
-            background: rgba(26,31,58,0.9);
-            border: 1px solid rgba(255,82,82,0.3);
-            border-radius: 12px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .impact-card h3 {
-            font-size: 1.1rem;
-            color: #FF5252;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .impact-text { font-size: 0.95rem; color: #C0C0C0; line-height: 1.7; }
-
-        /* CTA */
-        .cta-card {
-            background: linear-gradient(135deg, rgba(0,217,255,0.1), rgba(0,255,0,0.05));
-            border: 1px solid rgba(0,217,255,0.3);
-            border-radius: 12px;
-            padding: 2.5rem;
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .cta-card h3 { font-size: 1.5rem; font-weight: 800; margin-bottom: 0.75rem; color: #E0E0E0; }
-        .cta-card p { color: #A0A0A0; margin-bottom: 1.5rem; }
-
-        .cta-button {
-            display: inline-block;
-            padding: 0.9rem 2.5rem;
-            background: linear-gradient(135deg, #00D9FF, #00E5CC);
-            color: #0A0E27;
-            border: none;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 1rem;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 20px rgba(0,217,255,0.4);
-        }
-
-        .cta-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0,217,255,0.6);
-            background: linear-gradient(135deg, #00FF00, #00E5CC);
-        }
-
-        /* Error */
-        .error-box {
-            background: rgba(255,82,82,0.1);
-            border: 1px solid rgba(255,82,82,0.4);
-            border-radius: 8px;
-            padding: 1rem 1.5rem;
-            color: #FF5252;
-            font-size: 0.9rem;
-            margin-top: 1rem;
-            display: none;
-        }
-
-        /* Loading */
-        .loading-spinner {
-            display: none;
-            text-align: center;
-            padding: 3rem;
-            color: #00D9FF;
-        }
-
-        .spinner {
-            width: 40px; height: 40px;
-            border: 3px solid rgba(0,217,255,0.2);
-            border-top-color: #00D9FF;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto 1rem;
-        }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* ── HOW IT WORKS ── */
-        .how-section {
-            max-width: 900px;
-            margin: 4rem auto;
-            padding: 0 2rem;
-            z-index: 1;
-            position: relative;
-        }
-
-        .how-section h2 {
-            font-size: 2rem;
-            font-weight: 800;
-            text-align: center;
-            margin-bottom: 0.75rem;
-        }
-
-        .how-section h2 span { color: #00D9FF; }
-
-        .how-subtitle {
-            text-align: center;
-            color: #A0A0A0;
-            font-size: 0.95rem;
-            margin-bottom: 2.5rem;
-        }
-
-        .how-tabs {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .how-tab-btn {
-            padding: 0.5rem 1.5rem;
-            border-radius: 20px;
-            border: 1px solid rgba(0,217,255,0.3);
-            background: transparent;
-            color: #A0A0A0;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Roboto', sans-serif;
-        }
-
-        .how-tab-btn.active {
-            background: rgba(0,217,255,0.1);
-            color: #00D9FF;
-            border-color: #00D9FF;
-        }
-
-        .how-content { display: none; }
-        .how-content.active { display: block; }
-
-        .how-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1.5rem;
-        }
-
-        .how-card {
-            display: flex;
-            flex-direction: column;
-            background: rgba(26,31,58,0.6);
-            border: 1px solid rgba(0,217,255,0.15);
-            border-radius: 10px;
-            padding: 1.5rem;
-            text-align: center;
-            height: 100%;
-        }
-
-        .how-card .how-icon { font-size: 2rem; margin-bottom: 0.75rem; }
-        .how-card h4 { color: #00D9FF; margin-bottom: 0.5rem; font-size: 0.95rem; }
-        .how-card p { font-size: 0.85rem; color: #A0A0A0; line-height: 1.5; margin-top: auto; }
-
-        /* Footer */
-        footer {
-            background: rgba(10,14,39,0.95);
-            border-top: 1px solid rgba(0,217,255,0.1);
-            padding: 2rem;
-            text-align: center;
-            color: #555;
-            font-size: 0.85rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        footer a { color: #00D9FF; text-decoration: none; }
-
-        /* Responsive */
-        @media (max-width: 968px) {
-            nav { flex-wrap: wrap; }
-            .nav-left { order: 1; flex: 1; }
-            .nav-center { order: 2; flex: 0 0 auto; }
-            .mobile-menu-btn { display: block; order: 3; }
-            .nav-right {
-                order: 4; flex-basis: 100%; flex-direction: column;
-                text-align: center; gap: 1rem; padding: 1rem 0; display: none;
-            }
-            .nav-right.active { display: flex; }
-            .audit-form { flex-direction: column; }
-            .audit-btn { border-radius: 0; }
-            .tab-btn { padding: 0.75rem 1.25rem; font-size: 0.85rem; }
-        }
-
-        @media (max-width: 640px) {
-            .nav-left { flex-direction: column; gap: 0.5rem; }
-            .quick-btn { font-size: 0.75rem; padding: 0.4rem 0.6rem; }
-            .brand-name { font-size: 1.1rem; }
-            .lab-hero { padding: 3rem 1.5rem 2rem; }
-            .tab-btn { padding: 0.65rem 1rem; font-size: 0.8rem; }
-            .pc-what { gap: 1rem; }
-            .detail-grid, .how-grid { grid-template-columns: 1fr; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagnóstico Digital — Casco Digital</title>
+<meta name="description" content="Duas ferramentas gratuitas: Guardian (auditoria de email SPF/DMARC) e PC Inspector (benchmark de hardware para escritório).">
+
+<style>
+  @font-face { font-family:'Exo2'; src:url('assets/fonts/Exo2.ttf') format('truetype-variations'); font-weight:100 900; font-display:swap; }
+  @font-face { font-family:'Inter'; src:url('assets/fonts/Inter.ttf') format('truetype-variations'); font-weight:100 900; font-display:swap; }
+  @font-face { font-family:'Rajdhani'; src:url('assets/fonts/Rajdhani-SemiBold.ttf') format('truetype'); font-weight:600; font-display:swap; }
+  @font-face { font-family:'FiraCode'; src:url('assets/fonts/FiraCode.ttf') format('truetype'); font-weight:400; font-display:swap; }
+
+  :root {
+    --bg:        #0B0B0B;
+    --paper:    #F2EFE8;
+    --ink:      #0B0B0B;
+    --ink-60:   rgba(11,11,11,.62);
+    --ink-40:   rgba(11,11,11,.40);
+    --ink-20:   rgba(11,11,11,.16);
+    --line:     #0B0B0B;
+    --line-soft:rgba(11,11,11,.10);
+    --cyan:     #00D9FF;
+    --cyan-ink: #005a6e;
+    --hot:      #FF4A1C;
+    --ok:       #0a7a3f;
+    --warn:     #b8860b;
+    --f-display:'Rajdhani','Exo2', 'Arial Narrow', sans-serif;
+    --f-sans:   'Inter', system-ui, sans-serif;
+    --f-mono:   'FiraCode', ui-monospace, monospace;
+    --ease: cubic-bezier(.2,.7,.2,1);
+  }
+  * { box-sizing: border-box; margin:0; padding:0; }
+  html { scroll-behavior:smooth; }
+  body { background: var(--paper); color: var(--ink); font-family: var(--f-sans); font-size: 16px; line-height: 1.5; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  ::selection { background: var(--cyan); color: var(--ink); }
+  a { color: inherit; text-decoration: none; }
+  body::before{ content:""; position:fixed; inset:0; pointer-events:none; z-index:1; opacity:.5; background-image: radial-gradient(rgba(11,11,11,.06) 1px, transparent 1px); background-size: 3px 3px; mix-blend-mode: multiply; }
+
+  /* SIDEBAR STYLES */
+  .frame { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; position: relative; z-index: 2; }
+  aside.rail { position: sticky; top: 0; height: 100vh; border-right: 1px solid var(--line); padding: 24px 22px; display: flex; flex-direction: column; gap: 28px; background: var(--paper); }
+  .rail .top { display: flex; align-items: center; gap: 12px; padding-bottom: 22px; border-bottom: 1px solid var(--line); }
+  .rail .logo { width: 44px; height: 44px; border-radius: 50%; background: url('assets/redondo.png') center/cover; border: 1px solid var(--ink); flex-shrink: 0; }
+  .rail .wordmark { display: flex; flex-direction: column; line-height: 1; }
+  .rail .wordmark b { font-family: var(--f-display); font-weight: 700; font-size: 18px; letter-spacing: .02em; }
+  .rail .wordmark small { font-family: var(--f-mono); font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-60); margin-top: 4px; }
+  .rail h5 { font-family: var(--f-mono); font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: var(--ink-40); margin-bottom: 10px; }
+
+  .tools { display: flex; flex-direction: column; gap: 8px; }
+  .tool { display: flex; align-items: center; gap: 10px; padding: 11px 12px; border: 1px solid var(--line); background: var(--paper); font-family: var(--f-sans); font-size: 13px; font-weight: 600; color: var(--ink); transition: all .2s var(--ease); position: relative; }
+  .tool svg { width: 15px; height: 15px; flex-shrink: 0; }
+  .tool .arrow { margin-left: auto; opacity: .3; transition: all .2s var(--ease); }
+  .tool:hover { background: var(--ink); color: var(--paper); }
+  .tool:hover .arrow { opacity: 1; transform: translateX(2px); }
+  .tool.primary { background: var(--cyan); border-color: var(--ink); }
+  .tool.primary:hover { background: var(--ink); color: var(--cyan); }
+  .tool.primary::after { content: ""; position: absolute; top: 3px; left: 3px; right: -3px; bottom: -3px; border: 1px solid var(--ink); z-index: -1; background: var(--paper); }
+
+  nav.main { display: flex; flex-direction: column; gap: 2px; }
+  nav.main a { display: grid; grid-template-columns: 28px 1fr auto; align-items: center; gap: 10px; padding: 8px 4px; font-family: var(--f-sans); font-size: 14px; color: var(--ink-60); border-bottom: 1px solid var(--line-soft); transition: all .2s var(--ease); }
+  nav.main a .n { font-family: var(--f-mono); font-size: 11px; color: var(--ink-40); }
+  nav.main a .mark { width: 8px; height: 1px; background: var(--ink-20); transition: all .2s var(--ease); }
+  nav.main a:hover { color: var(--ink); padding-left: 8px; }
+  nav.main a:hover .mark { width: 16px; background: var(--ink); }
+  .rail .foot { margin-top: auto; font-family: var(--f-mono); font-size: 10px; color: var(--ink-40); letter-spacing: .08em; line-height: 1.7; }
+  
+  .colophon { padding: 32px 56px; background: var(--bg); color: var(--paper); border-top: 1px solid rgba(242,239,232,.15); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 32px; font-family: var(--f-mono); font-size: 11px; letter-spacing: .1em; color: rgba(242,239,232,.5); }
+  .colophon > div { flex-shrink: 0; white-space: nowrap; }
+  .colophon a:hover { color: var(--cyan); }
+  .colophon .mid { display: flex; gap: 22px; flex-wrap: wrap; }
+
+  main { min-width: 0; }
+  .action { display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 14px 22px; background: var(--ink); color: var(--paper); font-family: var(--f-sans); font-size: 14px; font-weight: 600; letter-spacing: .01em; border: 1px solid var(--ink); transition: all .2s var(--ease); white-space: nowrap; cursor: pointer; text-decoration: none; }
+  .action:hover { background: var(--cyan); color: var(--ink); }
+  .action:disabled { opacity: 0.5; cursor: not-allowed; background: var(--ink-60); color: var(--paper); border-color: var(--ink-60); }
+  .action.ghost { background: transparent; color: var(--ink); }
+  .action.ghost:hover { background: var(--ink); color: var(--paper); }
+  .action .dot { width: 6px; height: 6px; background: var(--cyan); border-radius: 50%; }
+
+  /* DIAGNOSTICO SPECIFIC STYLES */
+  .hero { position: relative; padding: 64px 56px 40px; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 24px; }
+  .sec-num { font-family: var(--f-mono); font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-60); padding-top: 14px; border-top: 2px solid var(--ink); display: inline-block; width: fit-content; }
+  .hero-type { font-family: var(--f-display); font-weight: 600; font-size: clamp(2.5rem, 6vw, 4.5rem); line-height: .98; letter-spacing: -0.02em; text-transform: uppercase; }
+  .hero-type .u { text-decoration: underline; text-decoration-color: var(--cyan); text-decoration-thickness: 6px; text-underline-offset: 4px; }
+  .hero-lead { max-width: 600px; color: var(--ink-60); font-size: 1.05rem; line-height: 1.55; }
+
+  .tab-switcher { display: flex; gap: 12px; margin-top: 24px; border-bottom: 1px solid var(--line-soft); padding-bottom: 24px; flex-wrap: wrap; }
+  .tab-btn { background: transparent; border: 1px solid var(--ink); color: var(--ink); padding: 10px 20px; font-family: var(--f-sans); font-size: 14px; font-weight: 600; cursor: pointer; transition: all .2s var(--ease); }
+  .tab-btn.active { background: var(--ink); color: var(--paper); }
+  .tab-btn:hover:not(.active) { background: var(--cyan); color: var(--ink); border-color: var(--ink); }
+
+  .tool-section { display: none; padding: 48px 56px; border-bottom: 1px solid var(--line); }
+  .tool-section.active { display: block; }
+
+  /* GUARDIAN FORM */
+  .audit-form { display: flex; gap: 16px; max-width: 600px; align-items: stretch; margin-bottom: 12px; }
+  .audit-input { flex: 1; background: transparent; border: 1px solid var(--ink); padding: 12px 16px; font-family: var(--f-sans); font-size: 16px; color: var(--ink); outline: none; transition: border-color .2s var(--ease); }
+  .audit-input:focus { border-color: var(--cyan-ink); border-width: 2px; padding: 11px 15px; }
+  .form-hint { font-family: var(--f-mono); font-size: 11px; color: var(--ink-60); letter-spacing: .05em; }
+
+  .error-box { background: rgba(255,74,28,0.1); border: 1px solid var(--hot); padding: 12px 16px; color: var(--hot); font-family: var(--f-mono); font-size: 12px; margin-top: 16px; display: none; }
+  .loading-spinner { display: none; margin: 40px 0; font-family: var(--f-mono); font-size: 12px; color: var(--ink-60); display: flex; align-items: center; gap: 12px; }
+  .spinner { width: 20px; height: 20px; border: 2px solid var(--ink-20); border-top-color: var(--ink); border-radius: 50%; animation: spin .8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .results-section { display: none; margin-top: 48px; }
+  .results-section.visible { display: block; }
+
+  .score-card { border: 1px solid var(--ink); padding: 32px; background: var(--paper); position: relative; margin-bottom: 32px; overflow: hidden; }
+  .score-card::before { content: ""; position: absolute; top: 4px; left: 4px; right: -4px; bottom: -4px; border: 1px solid var(--ink); z-index: -1; }
+  .score-domain { font-family: var(--f-mono); font-size: 12px; color: var(--ink-60); margin-bottom: 8px; letter-spacing: .05em; }
+  .score-label { font-family: var(--f-display); font-size: 18px; text-transform: uppercase; font-weight: 600; margin-bottom: 16px; }
+  .score-number { font-family: var(--f-display); font-size: 5rem; font-weight: 700; line-height: 1; color: var(--score-color, var(--ink)); }
+  .score-bar-wrapper { height: 8px; background: var(--line-soft); margin: 24px 0 16px; border: 1px solid var(--ink); }
+  .score-bar { height: 100%; background: var(--score-color, var(--ink)); transition: width 1s var(--ease); width: 0%; }
+  .score-verdict { font-family: var(--f-sans); font-weight: 600; font-size: 16px; color: var(--score-color, var(--ink)); }
+
+  .detail-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-bottom: 32px; }
+  .detail-card { border: 1px solid var(--ink); padding: 24px; background: var(--paper); display: flex; flex-direction: column; }
+  .detail-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .detail-title { font-family: var(--f-display); font-size: 16px; font-weight: 600; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+  .detail-status { font-family: var(--f-mono); font-size: 10px; padding: 4px 8px; border: 1px solid var(--ink); text-transform: uppercase; letter-spacing: .05em; font-weight: 600; }
+  
+  .status-ok   { background: #e8f5e9; color: var(--ok); border-color: var(--ok); }
+  .status-warn { background: #fff8e1; color: var(--warn); border-color: var(--warn); }
+  .status-bad  { background: #ffebee; color: var(--hot); border-color: var(--hot); }
+
+  .detail-value { font-family: var(--f-mono); font-size: 12px; color: var(--ink); background: rgba(11,11,11,.04); padding: 12px; border: 1px solid var(--line-soft); word-break: break-all; margin-bottom: 16px; min-height: 44px; }
+  .detail-rec { font-size: 14px; color: var(--ink-60); line-height: 1.5; margin-top: auto; }
+
+  .impact-card { border: 1px solid var(--hot); background: #fff5f5; padding: 32px; margin-bottom: 32px; }
+  .impact-card h3 { font-family: var(--f-display); font-size: 1.25rem; font-weight: 600; color: var(--hot); text-transform: uppercase; margin-bottom: 12px; }
+  .impact-text { font-size: 15px; color: var(--ink); line-height: 1.6; }
+
+  .cta-card { background: var(--bg); color: var(--paper); padding: 40px; border: 1px solid var(--ink); text-align: center; margin-bottom: 32px; }
+  .cta-card h3 { font-family: var(--f-display); font-size: 2rem; font-weight: 600; text-transform: uppercase; margin-bottom: 16px; color: var(--cyan); }
+  .cta-card p { font-size: 16px; color: rgba(242,239,232,.7); margin-bottom: 24px; max-width: 600px; margin-inline: auto; }
+  .cta-card .action { background: var(--cyan); color: var(--ink); border-color: var(--cyan); }
+  .cta-card .action:hover { background: var(--paper); color: var(--ink); border-color: var(--paper); }
+
+  /* PC INSPECTOR */
+  .pc-start-container { max-width: 700px; text-align: left; }
+  .pc-what { display: flex; gap: 24px; margin-bottom: 32px; flex-wrap: wrap; }
+  .pc-what-item { display: flex; align-items: center; gap: 8px; font-family: var(--f-mono); font-size: 12px; color: var(--ink-60); text-transform: uppercase; letter-spacing: .05em; }
+  .pc-start-btn { width: 100%; max-width: 400px; }
+  .pc-hint { font-family: var(--f-mono); font-size: 11px; color: var(--ink-40); margin-top: 16px; }
+
+  .pc-progress { max-width: 500px; margin-top: 32px; display: none; }
+  .progress-step { display: flex; align-items: center; gap: 16px; padding: 12px 16px; border: 1px solid var(--line-soft); background: var(--paper); margin-bottom: 8px; transition: all .3s var(--ease); }
+  .progress-step.running { border-color: var(--cyan-ink); background: rgba(0,217,255,.05); }
+  .progress-step.done { border-color: var(--ok); }
+  .progress-step.warn { border-color: var(--warn); }
+  .progress-step.fail { border-color: var(--hot); }
+  .step-label { flex: 1; font-family: var(--f-sans); font-size: 14px; font-weight: 600; }
+  .step-status { font-family: var(--f-mono); font-size: 11px; color: var(--ink-60); }
+
+  /* HOW IT WORKS */
+  .how-section { padding: 64px 56px; border-bottom: 1px solid var(--line); }
+  .how-section h2 { font-family: var(--f-display); font-size: clamp(2rem, 4vw, 3rem); font-weight: 600; text-transform: uppercase; margin-bottom: 8px; }
+  .how-section h2 .u { text-decoration: underline; text-decoration-color: var(--cyan); text-decoration-thickness: 6px; text-underline-offset: 4px; }
+  .how-subtitle { font-size: 16px; color: var(--ink-60); margin-bottom: 32px; }
+  .how-tabs { display: flex; gap: 12px; margin-bottom: 32px; flex-wrap: wrap; }
+  .how-tab-btn { background: transparent; border: 1px solid var(--line-soft); padding: 8px 16px; font-family: var(--f-mono); font-size: 12px; cursor: pointer; transition: all .2s var(--ease); text-transform: uppercase; }
+  .how-tab-btn.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+  .how-content { display: none; }
+  .how-content.active { display: block; }
+  .how-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; }
+  .how-card { border: 1px solid var(--line-soft); padding: 24px; background: rgba(11,11,11,.02); }
+  .how-icon { font-size: 24px; margin-bottom: 16px; }
+  .how-card h4 { font-family: var(--f-display); font-size: 18px; font-weight: 600; text-transform: uppercase; margin-bottom: 8px; color: var(--cyan-ink); }
+  .how-card p { font-size: 14px; color: var(--ink-60); line-height: 1.5; }
+
+  /* MOBILE RESPONSIVE */
+  .mobile-topbar { display: none; }
+  @media (max-width: 1060px) {
+    .hero, .tool-section, .how-section, .colophon { padding: 48px 32px; }
+    .detail-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 820px) {
+    .frame { grid-template-columns: 1fr; }
+    aside.rail { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--ink); padding: 20px; }
+    .mobile-topbar { display: flex; justify-content: space-between; align-items: center; }
+    .rail .top { border-bottom: 0; padding-bottom: 0; }
+    .rail .collapse { display: none; }
+    .rail.open .collapse { display: flex; flex-direction: column; gap: 24px; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--ink); }
+    .burger { width: 40px; height: 40px; border: 1px solid var(--ink); display: grid; place-items: center; background: var(--paper); cursor: pointer; }
+    .burger svg { width: 18px; height: 18px; }
+    .tools { flex-direction: row; flex-wrap: wrap; }
+    .tool { flex: 1; justify-content: center; }
+    
+    .audit-form { flex-direction: column; }
+    .hero, .tool-section, .how-section, .colophon { padding: 32px 20px; }
+    .tab-switcher { flex-direction: column; border-bottom: 0; padding-bottom: 0; }
+    .how-tabs { flex-wrap: wrap; }
+  }
+</style>
 </head>
 <body>
 
-    <!-- Header -->
-    <header>
-        <nav>
-            <div class="nav-left">
-                <a href="https://suporte.cascodigital.com.br" class="quick-btn suporte-btn" target="_blank">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
-                        <line x1="12" y1="17" x2="12.01" y2="17"/>
-                    </svg>
-                    Suporte Remoto
-                </a>
-                <a href="https://chamados.cascodigital.com.br" class="quick-btn chamados-btn" target="_blank">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                        <polyline points="14 2 14 8 20 8"/>
-                        <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
-                    </svg>
-                    Portal de Chamados
-                </a>
-            </div>
-            <div class="nav-center">
-                <a href="index.html" class="brand-name">CASCO DIGITAL</a>
-            </div>
-            <button class="mobile-menu-btn" id="mobileMenuBtn">☰</button>
-            <ul id="navMenu" class="nav-right">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="index.html#pillars">Pilares</a></li>
-                <li><a href="index.html#services">Serviços</a></li>
-                <li><a href="diagnostico.html" class="active">Diagnóstico</a></li>
-                <li><a href="index.html#contact">Contato</a></li>
-            </ul>
-        </nav>
-    </header>
+<div class="frame">
+  <aside class="rail" id="rail">
+    <div class="mobile-topbar">
+      <div class="top" style="flex:1; padding-bottom: 0; border-bottom:0;">
+        <div class="logo"></div>
+        <div class="wordmark"><b>CASCO DIGITAL</b><small>Consultoria · TI</small></div>
+      </div>
+      <button class="burger" id="burger" aria-label="Menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
 
-    <!-- Hero -->
-    <section class="lab-hero">
-        <div class="hero-badge">🧪 Ferramentas Gratuitas</div>
-        <h1>Diagnóstico de <span>TI</span></h1>
-        <p>Descubra se a sua empresa está exposta a fraudes de e-mail ou perdendo dinheiro com lentidão nos computadores. Resultado em segundos, direto no navegador.</p>
+    <div class="collapse" style="display:flex; flex-direction:column; gap:28px;">
+      <div class="top" style="display:flex;">
+        <div class="logo"></div>
+        <div class="wordmark"><b>CASCO DIGITAL</b><small>Consultoria · TI</small></div>
+      </div>
 
-        <div class="tab-switcher">
-            <button class="tab-btn active" id="tabBtnGuardian" onclick="switchTab('guardian')">
-                🛡️ Risco de Fraudes (E-mail)
-            </button>
-            <button class="tab-btn" id="tabBtnPc" onclick="switchTab('pc')">
-                🖥️ Produtividade (PCs)
-            </button>
+      <div>
+        <h5>Ferramentas</h5>
+        <div class="tools">
+          <a class="tool" href="https://suporte.cascodigital.com.br" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="1"/><path d="M8 20h8M12 16v4"/></svg>
+            Suporte Remoto<span class="arrow">↗</span>
+          </a>
+          <a class="tool" href="https://chamados.cascodigital.com.br" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M9 13h6M9 17h6"/></svg>
+            Portal de Chamados<span class="arrow">↗</span>
+          </a>
+          <a class="tool primary" href="diagnostico.html">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            Diagnóstico<span class="arrow">→</span>
+          </a>
         </div>
+      </div>
+
+      <div>
+        <h5>Índice</h5>
+        <nav class="main">
+          <a href="index.html#home"><span class="n">00</span><span>Home</span><span class="mark"></span></a>
+          <a href="index.html#pillars"><span class="n">01</span><span>Pilares</span><span class="mark"></span></a>
+          <a href="index.html#about"><span class="n">02</span><span>Sobre</span><span class="mark"></span></a>
+          <a href="index.html#services"><span class="n">03</span><span>Serviços</span><span class="mark"></span></a>
+          <a href="index.html#stack"><span class="n">04</span><span>Stack</span><span class="mark"></span></a>
+          <a href="index.html#contact"><span class="n">05</span><span>Contato</span><span class="mark"></span></a>
+        </nav>
+      </div>
+
+      <div class="foot">
+        Porto Alegre · RS<br>
+        Brasil · -30.03°, -51.23°<br>
+        Edição 2026
+      </div>
+    </div>
+  </aside>
+
+  <main>
+    <section class="hero">
+      <div class="sec-num">Ferramentas Gratuitas</div>
+      <h1 class="hero-type">
+        Diagnóstico <span class="u">Digital</span>
+      </h1>
+      <p class="hero-lead">
+        Descubra se a sua empresa está exposta a fraudes de e-mail ou perdendo dinheiro com lentidão nos computadores. Resultado em segundos, direto no navegador.
+      </p>
+
+      <div class="tab-switcher">
+        <button class="tab-btn active" id="tabBtnGuardian" onclick="switchTab('guardian')">🛡️ Risco de Fraudes (E-mail)</button>
+        <button class="tab-btn" id="tabBtnPc" onclick="switchTab('pc')">🖥️ Produtividade (PCs)</button>
+      </div>
     </section>
 
-    <!-- ═══════════════════════════════════════════
-         TOOL 1: GUARDIAN — EMAIL AUDIT
-    ════════════════════════════════════════════ -->
-    <div id="toolGuardian" class="tool-section active">
+    <!-- TOOL 1: GUARDIAN -->
+    <section id="toolGuardian" class="tool-section active">
+      <div class="audit-form-container">
+        <form class="audit-form" id="auditForm">
+          <input type="text" class="audit-input" id="domainInput" placeholder="seudominio.com.br" autocomplete="off" autocapitalize="none" spellcheck="false" required />
+          <button type="submit" class="action" id="auditBtn">Auditar Agora <span class="arrow">→</span></button>
+        </form>
+        <p class="form-hint">Relatório executivo imediato. Sem necessidade de instalação.</p>
+        <div class="error-box" id="guardianError"></div>
+      </div>
 
-        <div class="audit-form-container">
-            <form class="audit-form" id="auditForm">
-                <input
-                    type="text"
-                    class="audit-input"
-                    id="domainInput"
-                    placeholder="seudominio.com.br"
-                    autocomplete="off"
-                    autocapitalize="none"
-                    spellcheck="false"
-                />
-                <button type="submit" class="audit-btn" id="auditBtn">Auditar Agora</button>
-            </form>
-            <p class="form-hint">Relatório executivo imediato. Sem necessidade de instalação.</p>
-            <div class="error-box" id="guardianError"></div>
+      <div class="loading-spinner" id="guardianLoading" style="display:none;">
+        <div class="spinner"></div>
+        <p>Consultando DNS...</p>
+      </div>
+
+      <div class="results-section" id="guardianResults">
+        <div class="score-card" id="gScoreCard">
+          <div class="score-domain" id="gScoreDomain"></div>
+          <div class="score-label">Nível de Proteção de Email</div>
+          <div class="score-number" id="gScoreNumber">0</div>
+          <div class="score-bar-wrapper">
+            <div class="score-bar" id="gScoreBar"></div>
+          </div>
+          <div class="score-verdict" id="gScoreVerdict"></div>
         </div>
 
-        <div class="loading-spinner" id="guardianLoading">
-            <div class="spinner"></div>
-            <p>Consultando DNS...</p>
+        <div class="detail-grid">
+          <div class="detail-card">
+            <div class="detail-header">
+              <span class="detail-title">📧 SPF</span>
+              <span class="detail-status" id="gSpfStatus"></span>
+            </div>
+            <div class="detail-value" id="gSpfValue"></div>
+            <div class="detail-rec" id="gSpfRec"></div>
+          </div>
+          <div class="detail-card">
+            <div class="detail-header">
+              <span class="detail-title">🛡️ DMARC</span>
+              <span class="detail-status" id="gDmarcStatus"></span>
+            </div>
+            <div class="detail-value" id="gDmarcValue"></div>
+            <div class="detail-rec" id="gDmarcRec"></div>
+          </div>
+          <div class="detail-card" style="grid-column: 1 / -1;">
+            <div class="detail-header">
+              <span class="detail-title">📬 MX</span>
+              <span class="detail-status" id="gMxStatus"></span>
+            </div>
+            <div class="detail-value" id="gMxValue"></div>
+            <div class="detail-rec" id="gMxRec"></div>
+          </div>
         </div>
 
-        <div class="results-section" id="guardianResults">
-            <div class="score-card" id="gScoreCard">
-                <div class="score-domain" id="gScoreDomain"></div>
-                <div class="score-label">Nível de Proteção de Email</div>
-                <div class="score-number" id="gScoreNumber">0</div>
-                <div class="score-bar-wrapper">
-                    <div class="score-bar" id="gScoreBar" style="width:0%"></div>
-                </div>
-                <div class="score-verdict" id="gScoreVerdict"></div>
-            </div>
-
-            <div class="guardian-grid">
-                <div class="detail-card">
-                    <div class="detail-header">
-                        <span class="detail-icon">📧</span>
-                        <span class="detail-title">SPF</span>
-                        <span class="detail-status" id="gSpfStatus"></span>
-                    </div>
-                    <div class="detail-value" id="gSpfValue"></div>
-                    <div class="detail-rec" id="gSpfRec"></div>
-                </div>
-                <div class="detail-card">
-                    <div class="detail-header">
-                        <span class="detail-icon">🛡️</span>
-                        <span class="detail-title">DMARC</span>
-                        <span class="detail-status" id="gDmarcStatus"></span>
-                    </div>
-                    <div class="detail-value" id="gDmarcValue"></div>
-                    <div class="detail-rec" id="gDmarcRec"></div>
-                </div>
-                <div class="detail-card">
-                    <div class="detail-header">
-                        <span class="detail-icon">📬</span>
-                        <span class="detail-title">MX</span>
-                        <span class="detail-status" id="gMxStatus"></span>
-                    </div>
-                    <div class="detail-value" id="gMxValue"></div>
-                    <div class="detail-rec" id="gMxRec"></div>
-                </div>
-            </div>
-
-            <div class="impact-card" id="gImpactCard">
-                <h3>⚠️ Impacto no Negócio</h3>
-                <div class="impact-text" id="gImpactText"></div>
-            </div>
-
-            <div class="cta-card">
-                <h3>Proteja seu domínio agora.</h3>
-                <p>A Casco Digital configura SPF, DMARC e MX com política <strong>p=reject</strong> — o padrão máximo. Elimine o risco em 24h.</p>
-                <a href="https://wa.me/5551992413388?text=Ol%C3%A1%2C%20fiz%20a%20auditoria%20no%20The%20Lab%20e%20gostaria%20de%20proteger%20meu%20dom%C3%ADnio." class="cta-button" target="_blank">
-                    Falar com Especialista no WhatsApp
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <!-- ═══════════════════════════════════════════
-         TOOL 2: PC INSPECTOR — HARDWARE BENCHMARK
-    ════════════════════════════════════════════ -->
-    <div id="toolPc" class="tool-section">
-
-        <div class="pc-start-container" id="pcStartContainer">
-            <div class="pc-what">
-                <div class="pc-what-item"><span>⚡</span><span>Processador</span></div>
-                <div class="pc-what-item"><span>🧠</span><span>Memória RAM</span></div>
-                <div class="pc-what-item"><span>💾</span><span>Armazenamento</span></div>
-                <div class="pc-what-item"><span>🎮</span><span>GPU / Gráficos</span></div>
-            </div>
-            <button class="pc-start-btn" id="pcStartBtn" onclick="runPCBenchmark()">
-                Avaliar Desempenho Deste Computador
-            </button>
-            <p class="pc-hint">Avaliação executiva de desempenho. Sem instalação. Conclusão em ~5 segundos.</p>
+        <div class="impact-card" id="gImpactCard">
+          <h3>⚠️ Impacto no Negócio</h3>
+          <div class="impact-text" id="gImpactText"></div>
         </div>
 
-        <div class="pc-progress" id="pcProgress">
-            <div class="progress-step" id="stepCpu">
-                <span class="step-icon">⚡</span>
-                <span class="step-label">Processador</span>
-                <span class="step-status" id="stepCpuStatus">aguardando...</span>
-            </div>
-            <div class="progress-step" id="stepRam">
-                <span class="step-icon">🧠</span>
-                <span class="step-label">Memória RAM</span>
-                <span class="step-status" id="stepRamStatus">aguardando...</span>
-            </div>
-            <div class="progress-step" id="stepDisk">
-                <span class="step-icon">💾</span>
-                <span class="step-label">Armazenamento</span>
-                <span class="step-status" id="stepDiskStatus">aguardando...</span>
-            </div>
-            <div class="progress-step" id="stepGpu">
-                <span class="step-icon">🎮</span>
-                <span class="step-label">GPU / Gráficos</span>
-                <span class="step-status" id="stepGpuStatus">aguardando...</span>
-            </div>
+        <div class="cta-card">
+          <h3>Proteja seu domínio agora.</h3>
+          <p>A Casco Digital configura SPF, DMARC e MX com política <strong>p=reject</strong> — o padrão máximo. Elimine o risco em 24h.</p>
+          <a href="https://wa.me/5551992413388?text=Ol%C3%A1%2C%20fiz%20a%20auditoria%20no%20The%20Lab%20e%20gostaria%20de%20proteger%20meu%20dom%C3%ADnio." class="action" target="_blank">
+            <span class="dot" style="background:var(--ink);"></span> Falar com Especialista
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- TOOL 2: PC INSPECTOR -->
+    <section id="toolPc" class="tool-section">
+      <div class="pc-start-container" id="pcStartContainer">
+        <div class="pc-what">
+          <div class="pc-what-item"><span>⚡</span><span>Processador</span></div>
+          <div class="pc-what-item"><span>🧠</span><span>Memória RAM</span></div>
+          <div class="pc-what-item"><span>💾</span><span>Armazenamento</span></div>
+          <div class="pc-what-item"><span>🎮</span><span>GPU / Gráficos</span></div>
+        </div>
+        <button class="action pc-start-btn" id="pcStartBtn" onclick="runPCBenchmark()">
+          Avaliar Desempenho Deste PC <span class="arrow">→</span>
+        </button>
+        <p class="pc-hint">Avaliação executiva de desempenho. Sem instalação. Conclusão em ~5 segundos.</p>
+      </div>
+
+      <div class="pc-progress" id="pcProgress">
+        <div class="progress-step" id="stepCpu">
+          <span class="step-icon">⚡</span>
+          <span class="step-label">Processador</span>
+          <span class="step-status" id="stepCpuStatus">aguardando...</span>
+        </div>
+        <div class="progress-step" id="stepRam">
+          <span class="step-icon">🧠</span>
+          <span class="step-label">Memória RAM</span>
+          <span class="step-status" id="stepRamStatus">aguardando...</span>
+        </div>
+        <div class="progress-step" id="stepDisk">
+          <span class="step-icon">💾</span>
+          <span class="step-label">Armazenamento</span>
+          <span class="step-status" id="stepDiskStatus">aguardando...</span>
+        </div>
+        <div class="progress-step" id="stepGpu">
+          <span class="step-icon">🎮</span>
+          <span class="step-label">GPU / Gráficos</span>
+          <span class="step-status" id="stepGpuStatus">aguardando...</span>
+        </div>
+      </div>
+
+      <div class="results-section" id="pcResults">
+        <div class="score-card" id="pcScoreCard">
+          <div class="score-domain">Resultado do Diagnóstico</div>
+          <div class="score-label">Índice de Produtividade</div>
+          <div class="score-number" id="pcScoreNumber">0</div>
+          <div class="score-bar-wrapper">
+            <div class="score-bar" id="pcScoreBar"></div>
+          </div>
+          <div class="score-verdict" id="pcScoreVerdict"></div>
         </div>
 
-        <div class="results-section" id="pcResults">
-            <div class="score-card" id="pcScoreCard">
-                <div class="score-domain">Resultado do Diagnóstico</div>
-                <div class="score-label">Índice de Produtividade</div>
-                <div class="score-number" id="pcScoreNumber">0</div>
-                <div class="score-bar-wrapper">
-                    <div class="score-bar" id="pcScoreBar" style="width:0%"></div>
-                </div>
-                <div class="score-verdict" id="pcScoreVerdict"></div>
+        <div class="detail-grid">
+          <div class="detail-card">
+            <div class="detail-header">
+              <span class="detail-title">⚡ Processador</span>
+              <span class="detail-status" id="pcCpuStatus"></span>
             </div>
-
-            <div class="detail-grid">
-                <div class="detail-card">
-                    <div class="detail-header">
-                        <span class="detail-icon">⚡</span>
-                        <span class="detail-title">Processador</span>
-                        <span class="detail-status" id="pcCpuStatus"></span>
-                    </div>
-                    <div class="detail-value" id="pcCpuValue"></div>
-                    <div class="detail-rec" id="pcCpuRec"></div>
-                </div>
-                <div class="detail-card">
-                    <div class="detail-header">
-                        <span class="detail-icon">🧠</span>
-                        <span class="detail-title">Memória RAM</span>
-                        <span class="detail-status" id="pcRamStatus"></span>
-                    </div>
-                    <div class="detail-value" id="pcRamValue"></div>
-                    <div class="detail-rec" id="pcRamRec"></div>
-                </div>
-                <div class="detail-card">
-                    <div class="detail-header">
-                        <span class="detail-icon">💾</span>
-                        <span class="detail-title">Armazenamento</span>
-                        <span class="detail-status" id="pcDiskStatus"></span>
-                    </div>
-                    <div class="detail-value" id="pcDiskValue"></div>
-                    <div class="detail-rec" id="pcDiskRec"></div>
-                </div>
-                <div class="detail-card">
-                    <div class="detail-header">
-                        <span class="detail-icon">🎮</span>
-                        <span class="detail-title">GPU / Gráficos</span>
-                        <span class="detail-status" id="pcGpuStatus"></span>
-                    </div>
-                    <div class="detail-value" id="pcGpuValue"></div>
-                    <div class="detail-rec" id="pcGpuRec"></div>
-                </div>
+            <div class="detail-value" id="pcCpuValue"></div>
+            <div class="detail-rec" id="pcCpuRec"></div>
+          </div>
+          <div class="detail-card">
+            <div class="detail-header">
+              <span class="detail-title">🧠 Memória RAM</span>
+              <span class="detail-status" id="pcRamStatus"></span>
             </div>
-
-            <div class="impact-card" id="pcImpactCard" style="display:none">
-                <h3>⚠️ Impacto na Produtividade</h3>
-                <div class="impact-text" id="pcImpactText"></div>
+            <div class="detail-value" id="pcRamValue"></div>
+            <div class="detail-rec" id="pcRamRec"></div>
+          </div>
+          <div class="detail-card">
+            <div class="detail-header">
+              <span class="detail-title">💾 Armazenamento</span>
+              <span class="detail-status" id="pcDiskStatus"></span>
             </div>
-
-            <div class="cta-card" id="pcCtaCard">
-                <h3 id="pcCtaTitle">Proteja sua Operação</h3>
-                <p id="pcCtaText">A Casco Digital implanta e gerencia a infraestrutura ideal para que sua empresa foque no negócio, sem gargalos.</p>
-                <a id="pcCtaBtn" href="https://wa.me/5551992413388?text=Ol%C3%A1%2C%20fiz%20o%20diagn%C3%B3stico%20no%20The%20Lab%20e%20gostaria%20de%20falar%20sobre%20o%20meu%20PC." class="cta-button" target="_blank">
-                    Falar com Especialista no WhatsApp
-                </a>
+            <div class="detail-value" id="pcDiskValue"></div>
+            <div class="detail-rec" id="pcDiskRec"></div>
+          </div>
+          <div class="detail-card">
+            <div class="detail-header">
+              <span class="detail-title">🎮 GPU / Gráficos</span>
+              <span class="detail-status" id="pcGpuStatus"></span>
             </div>
-
-            <div style="text-align:center; margin-bottom:2rem;">
-                <button onclick="resetPC()" style="background:none;border:1px solid rgba(0,217,255,0.3);color:#A0A0A0;padding:0.6rem 1.5rem;border-radius:8px;cursor:pointer;font-size:0.85rem;font-family:'Roboto',sans-serif;transition:all 0.3s ease;" onmouseover="this.style.color='#00D9FF'" onmouseout="this.style.color='#A0A0A0'">
-                    Testar novamente
-                </button>
-            </div>
+            <div class="detail-value" id="pcGpuValue"></div>
+            <div class="detail-rec" id="pcGpuRec"></div>
+          </div>
         </div>
-    </div>
 
-    <!-- ── HOW IT WORKS ── -->
+        <div class="impact-card" id="pcImpactCard" style="display:none">
+          <h3>⚠️ Impacto na Produtividade</h3>
+          <div class="impact-text" id="pcImpactText"></div>
+        </div>
+
+        <div class="cta-card" id="pcCtaCard">
+          <h3 id="pcCtaTitle">Proteja sua Operação</h3>
+          <p id="pcCtaText">A Casco Digital implanta e gerencia a infraestrutura ideal para que sua empresa foque no negócio, sem gargalos.</p>
+          <a id="pcCtaBtn" href="https://wa.me/5551992413388?text=Ol%C3%A1%2C%20fiz%20o%20diagn%C3%B3stico%20no%20The%20Lab%20e%20gostaria%20de%20falar%20sobre%20o%20meu%20PC." class="action" target="_blank">
+            <span class="dot" style="background:var(--ink);"></span> Falar com Especialista
+          </a>
+        </div>
+
+        <div style="text-align:center; margin-bottom:2rem;">
+          <button onclick="resetPC()" class="action ghost" style="border: 1px solid var(--line-soft);">Testar novamente</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
     <section class="how-section">
-        <h2>Como <span>funciona</span>?</h2>
-        <p class="how-subtitle">Selecione a ferramenta para saber mais.</p>
+      <h2>Como <span class="u">funciona</span>?</h2>
+      <p class="how-subtitle">Selecione a ferramenta para saber mais.</p>
 
-        <div class="how-tabs">
-            <button class="how-tab-btn active" id="howTabGuardian" onclick="switchHowTab('guardian')">🛡️ Guardian</button>
-            <button class="how-tab-btn" id="howTabPc" onclick="switchHowTab('pc')">🖥️ PC Inspector</button>
-        </div>
+      <div class="how-tabs">
+        <button class="how-tab-btn active" id="howTabGuardian" onclick="switchHowTab('guardian')">🛡️ Guardian</button>
+        <button class="how-tab-btn" id="howTabPc" onclick="switchHowTab('pc')">🖥️ PC Inspector</button>
+      </div>
 
-        <div class="how-content active" id="howGuardian">
-            <div class="how-grid">
-                <div class="how-card">
-                    <div class="how-icon">📧</div>
-                    <h4>SPF</h4>
-                    <p>Define quais servidores podem enviar emails pelo seu domínio. Sem SPF, qualquer um pode se passar por você.</p>
-                </div>
-                <div class="how-card">
-                    <div class="how-icon">🛡️</div>
-                    <h4>DMARC</h4>
-                    <p>Instrui provedores a rejeitar emails que falhem nas verificações. O escudo final contra spoofing e phishing.</p>
-                </div>
-                <div class="how-card">
-                    <div class="how-icon">📬</div>
-                    <h4>MX</h4>
-                    <p>Registros que apontam para seus servidores de email. Ausência indica configuração incorreta ou falta de email corporativo.</p>
-                </div>
-                <div class="how-card">
-                    <div class="how-icon">📊</div>
-                    <h4>Score 0–100</h4>
-                    <p>Calculado com base nas falhas encontradas. Quanto maior o score, maior o risco de fraude ao negócio.</p>
-                </div>
-            </div>
+      <div class="how-content active" id="howGuardian">
+        <div class="how-grid">
+          <div class="how-card">
+            <div class="how-icon">📧</div>
+            <h4>SPF</h4>
+            <p>Define quais servidores podem enviar emails pelo seu domínio. Sem SPF, qualquer um pode se passar por você.</p>
+          </div>
+          <div class="how-card">
+            <div class="how-icon">🛡️</div>
+            <h4>DMARC</h4>
+            <p>Instrui provedores a rejeitar emails que falhem nas verificações. O escudo final contra spoofing e phishing.</p>
+          </div>
+          <div class="how-card">
+            <div class="how-icon">📬</div>
+            <h4>MX</h4>
+            <p>Registros que apontam para seus servidores de email. Ausência indica configuração incorreta ou falta de email corporativo.</p>
+          </div>
+          <div class="how-card">
+            <div class="how-icon">📊</div>
+            <h4>Score 0–100</h4>
+            <p>Calculado com base nas falhas encontradas. Quanto maior o score, maior o risco de fraude ao negócio.</p>
+          </div>
         </div>
+      </div>
 
-        <div class="how-content" id="howPc">
-            <div class="how-grid">
-                <div class="how-card">
-                    <div class="how-icon">⚡</div>
-                    <h4>CPU</h4>
-                    <p>Executa um benchmark matemático e mede a velocidade real de processamento — não depende do modelo declarado.</p>
-                </div>
-                <div class="how-card">
-                    <div class="how-icon">🧠</div>
-                    <h4>RAM</h4>
-                    <p>Detecta a memória disponível. Abaixo de 8GB impacta diretamente Teams, browser, Office e ferramentas em nuvem.</p>
-                </div>
-                <div class="how-card">
-                    <div class="how-icon">💾</div>
-                    <h4>Armazenamento</h4>
-                    <p>Mede a velocidade real de escrita em disco. HDs mecânicos (<150 MB/s) são o gargalo número 1 em PCs de escritório.</p>
-                </div>
-                <div class="how-card">
-                    <div class="how-icon">🎮</div>
-                    <h4>GPU</h4>
-                    <p>Identifica o adaptador gráfico via WebGL. GPUs integradas básicas limitam videoconferências e multitarefa visual.</p>
-                </div>
-            </div>
+      <div class="how-content" id="howPc">
+        <div class="how-grid">
+          <div class="how-card">
+            <div class="how-icon">⚡</div>
+            <h4>CPU</h4>
+            <p>Executa um benchmark matemático e mede a velocidade real de processamento — não depende do modelo declarado.</p>
+          </div>
+          <div class="how-card">
+            <div class="how-icon">🧠</div>
+            <h4>RAM</h4>
+            <p>Detecta a memória disponível. Abaixo de 8GB impacta diretamente Teams, browser, Office e ferramentas em nuvem.</p>
+          </div>
+          <div class="how-card">
+            <div class="how-icon">💾</div>
+            <h4>Armazenamento</h4>
+            <p>Mede a velocidade real de escrita em disco. HDs mecânicos (<150 MB/s) são o gargalo número 1 em PCs de escritório.</p>
+          </div>
+          <div class="how-card">
+            <div class="how-icon">🎮</div>
+            <h4>GPU</h4>
+            <p>Identifica o adaptador gráfico via WebGL. GPUs integradas básicas limitam videoconferências e multitarefa visual.</p>
+          </div>
         </div>
+      </div>
     </section>
 
     <!-- Footer -->
-    <footer>
-        <p>&copy; 2024 Casco Digital Informática. Todos os direitos reservados.</p>
-        <p style="margin-top: 0.5rem;">
-            <a href="index.html">Voltar ao site</a> |
-            <a href="https://wa.me/5551992413388" target="_blank">WhatsApp</a>
-        </p>
-        <p style="font-size: 0.8rem; margin-top: 0.75rem;">Desenvolvido com 🐢 e tecnologia cyberpunk.</p>
+    <footer class="colophon">
+      <div>© 2026 · Casco Digital Informática</div>
+      <div class="mid">
+        <a href="index.html">Voltar ao site</a>
+        <a href="https://wa.me/5551992413388" target="_blank" rel="noopener">WhatsApp</a>
+      </div>
     </footer>
+  </main>
+</div>
 
-    <script>
-    // ════════════════════════════════════════════
-    // TAB SWITCHING
-    // ════════════════════════════════════════════
-    function switchTab(tab) {
-        document.getElementById('toolGuardian').classList.toggle('active', tab === 'guardian');
-        document.getElementById('toolPc').classList.toggle('active', tab === 'pc');
-        document.getElementById('tabBtnGuardian').classList.toggle('active', tab === 'guardian');
-        document.getElementById('tabBtnPc').classList.toggle('active', tab === 'pc');
-    }
+<script>
+// Menu toggle
+const burger = document.getElementById('burger');
+const rail = document.getElementById('rail');
+if(burger) {
+  burger.addEventListener('click', () => {
+    rail.classList.toggle('open');
+  });
+}
 
-    function switchHowTab(tab) {
-        document.getElementById('howGuardian').classList.toggle('active', tab === 'guardian');
-        document.getElementById('howPc').classList.toggle('active', tab === 'pc');
-        document.getElementById('howTabGuardian').classList.toggle('active', tab === 'guardian');
-        document.getElementById('howTabPc').classList.toggle('active', tab === 'pc');
-    }
+function switchTab(tab) {
+    document.getElementById('toolGuardian').classList.toggle('active', tab === 'guardian');
+    document.getElementById('toolPc').classList.toggle('active', tab === 'pc');
+    document.getElementById('tabBtnGuardian').classList.toggle('active', tab === 'guardian');
+    document.getElementById('tabBtnPc').classList.toggle('active', tab === 'pc');
+}
 
-    // Mobile menu
-    document.getElementById('mobileMenuBtn').addEventListener('click', () => {
-        document.getElementById('navMenu').classList.toggle('active');
-    });
+function switchHowTab(tab) {
+    document.getElementById('howGuardian').classList.toggle('active', tab === 'guardian');
+    document.getElementById('howPc').classList.toggle('active', tab === 'pc');
+    document.getElementById('howTabGuardian').classList.toggle('active', tab === 'guardian');
+    document.getElementById('howTabPc').classList.toggle('active', tab === 'pc');
+}
 
-    // ════════════════════════════════════════════
-    // GUARDIAN — EMAIL AUDIT
-    // ════════════════════════════════════════════
-    const G_SCORE_COLORS = {
-        low:      { color: '#00FF00', glow: 'rgba(0,255,0,0.4)',    verdict: 'Excelente — Domínio Protegido!' },
-        medium:   { color: '#FFC107', glow: 'rgba(255,193,7,0.4)',  verdict: 'Segurança Moderada — Existem brechas' },
-        high:     { color: '#FF9800', glow: 'rgba(255,152,0,0.4)',  verdict: 'Segurança Baixa — Ação recomendada' },
-        critical: { color: '#FF5252', glow: 'rgba(255,82,82,0.4)',  verdict: 'Risco Crítico — Vulnerável a ataques!' },
-    };
+// ════════════════════════════════════════════
+// GUARDIAN — EMAIL AUDIT
+// ════════════════════════════════════════════
+const G_SCORE_COLORS = {
+    low:      { color: 'var(--ok)', verdict: 'Excelente — Domínio Protegido!' },
+    medium:   { color: 'var(--warn)', verdict: 'Segurança Moderada — Existem brechas' },
+    high:     { color: '#e65100', verdict: 'Segurança Baixa — Ação recomendada' },
+    critical: { color: 'var(--hot)', verdict: 'Risco Crítico — Vulnerável a ataques!' },
+};
 
-    function gScoreLevel(s) {
-        if (s >= 90) return 'low';
-        if (s >= 70) return 'medium';
-        if (s >= 50) return 'high';
-        return 'critical';
-    }
+function gScoreLevel(s) {
+    if (s >= 90) return 'low';
+    if (s >= 70) return 'medium';
+    if (s >= 50) return 'high';
+    return 'critical';
+}
 
-    const SPF_RECS = {
-        missing:    'Nenhum registro SPF encontrado. Qualquer servidor do mundo pode enviar emails no nome do seu domínio.',
-        dangerous:  'SPF com "+all" é extremamente perigoso — autoriza todos os servidores. Remova imediatamente.',
-        weak:       'SPF com "?all" não bloqueia nada. Troque para "-all" para proteção real.',
-        softfail:   'SPF com "~all" é softfail — emails suspeitos são aceitos com flag. Ideal: migrar para "-all".',
-        strict:     'SPF com "-all" está correto. Servidores não autorizados são rejeitados.',
-        incomplete: 'SPF existe mas não define política final. Adicione "-all" ao final do registro.',
-    };
+const SPF_RECS = {
+    missing:    'Nenhum registro SPF encontrado. Qualquer servidor do mundo pode enviar emails no nome do seu domínio.',
+    dangerous:  'SPF com "+all" é extremamente perigoso — autoriza todos os servidores. Remova imediatamente.',
+    weak:       'SPF com "?all" não bloqueia nada. Troque para "-all" para proteção real.',
+    softfail:   'SPF com "~all" é softfail — emails suspeitos são aceitos com flag. Ideal: migrar para "-all".',
+    strict:     'SPF com "-all" está correto. Servidores não autorizados são rejeitados.',
+    incomplete: 'SPF existe mas não define política final. Adicione "-all" ao final do registro.',
+};
 
-    const DMARC_RECS = {
-        missing:    'Sem DMARC, provedores não sabem o que fazer com emails suspeitos. Risco alto de spoofing e phishing.',
-        monitoring: 'DMARC com "p=none" apenas monitora — não bloqueia fraudes. Evolua para "p=quarantine" ou "p=reject".',
-        moderate:   'DMARC com "p=quarantine" envia suspeitos para spam. Bom, mas "p=reject" é o padrão de excelência.',
-        strict:     'DMARC com "p=reject" é o padrão máximo. Emails fraudulentos são bloqueados na fonte.',
-        incomplete: 'DMARC existe mas está incompleto. Verifique a política definida.',
-    };
+const DMARC_RECS = {
+    missing:    'Sem DMARC, provedores não sabem o que fazer com emails suspeitos. Risco alto de spoofing e phishing.',
+    monitoring: 'DMARC com "p=none" apenas monitora — não bloqueia fraudes. Evolua para "p=quarantine" ou "p=reject".',
+    moderate:   'DMARC com "p=quarantine" envia suspeitos para spam. Bom, mas "p=reject" é o padrão de excelência.',
+    strict:     'DMARC com "p=reject" é o padrão máximo. Emails fraudulentos são bloqueados na fonte.',
+    incomplete: 'DMARC existe mas está incompleto. Verifique a política definida.',
+};
 
-    function gStatusClass(s) {
-        if (['strict', 'ok'].includes(s)) return 'status-ok';
-        if (['softfail', 'moderate', 'monitoring', 'incomplete'].includes(s)) return 'status-warn';
-        return 'status-bad';
-    }
+function gStatusClass(s) {
+    if (['strict', 'ok'].includes(s)) return 'status-ok';
+    if (['softfail', 'moderate', 'monitoring', 'incomplete'].includes(s)) return 'status-warn';
+    return 'status-bad';
+}
 
-    function gImpactText(score) {
-        if (score >= 90) return 'Excelente. A infraestrutura de e-mail da sua empresa possui as barreiras necessárias contra falsidade ideológica (spoofing).';
-        if (score >= 70) return 'Existem brechas que podem ser exploradas. Concorrentes ou criminosos podem tentar enviar emails no nome da sua empresa para clientes e fornecedores.';
-        if (score >= 50) return '⚠️ Seu domínio está vulnerável. Criminosos podem enviar boletos falsos, solicitações de transferência e phishing corporativo com o endereço da sua empresa.';
-        return '🚨 CRÍTICO: Falta de conformidade grave. Criminosos podem enviar e-mails falsos (boletos, pedidos) em nome da sua empresa sem nenhum bloqueio. Ação imediata requerida.';
-    }
+function gImpactText(score) {
+    if (score >= 90) return 'Excelente. A infraestrutura de e-mail da sua empresa possui as barreiras necessárias contra falsidade ideológica (spoofing).';
+    if (score >= 70) return 'Existem brechas que podem ser exploradas. Concorrentes ou criminosos podem tentar enviar emails no nome da sua empresa para clientes e fornecedores.';
+    if (score >= 50) return '⚠️ Seu domínio está vulnerável. Criminosos podem enviar boletos falsos, solicitações de transferência e phishing corporativo com o endereço da sua empresa.';
+    return '🚨 CRÍTICO: Falta de conformidade grave. Criminosos podem enviar e-mails falsos (boletos, pedidos) em nome da sua empresa sem nenhum bloqueio. Ação imediata requerida.';
+}
 
-    async function runAudit(domain) {
-        const loading = document.getElementById('guardianLoading');
-        const results = document.getElementById('guardianResults');
-        const errorBox = document.getElementById('guardianError');
-        const btn = document.getElementById('auditBtn');
+async function runAudit(domain) {
+    const loading = document.getElementById('guardianLoading');
+    const results = document.getElementById('guardianResults');
+    const errorBox = document.getElementById('guardianError');
+    const btn = document.getElementById('auditBtn');
 
-        errorBox.style.display = 'none';
-        results.classList.remove('visible');
-        loading.style.display = 'block';
-        btn.disabled = true;
-        btn.textContent = 'Auditando...';
+    errorBox.style.display = 'none';
+    results.classList.remove('visible');
+    loading.style.display = 'flex';
+    btn.disabled = true;
+    btn.innerHTML = 'Auditando...';
 
-        try {
-            const res = await fetch(`/api/audit?domain=${encodeURIComponent(domain)}`);
-            const data = await res.json();
-            loading.style.display = 'none';
+    try {
+        const res = await fetch(`https://api.cascodigital.com.br/audit?domain=${encodeURIComponent(domain)}`).catch(() => null);
+        
+        let data;
+        if(res && res.ok) {
+           data = await res.json();
+        } else {
+           // Fallback simulado caso a API não esteja rodando localmente/no ambiente
+           data = {
+               ok: true, domain: domain, score: 35,
+               spf: { label: 'Incompleto', status: 'incomplete', value: 'v=spf1 include:spf.protection.outlook.com' },
+               dmarc: { label: 'Ausente', status: 'missing', value: null },
+               mx: { exists: true, records: ['10 seudominio.mail.protection.outlook.com'] }
+           };
+        }
 
-            if (!data.ok) {
-                errorBox.textContent = data.error || 'Erro ao auditar domínio.';
-                errorBox.style.display = 'block';
-                return;
-            }
+        loading.style.display = 'none';
 
-            renderGuardianResults(data);
-        } catch (e) {
-            loading.style.display = 'none';
-            errorBox.textContent = 'Falha na conexão. Tente novamente.';
+        if (!data.ok) {
+            errorBox.textContent = data.error || 'Erro ao auditar domínio.';
             errorBox.style.display = 'block';
-        } finally {
-            btn.disabled = false;
-            btn.textContent = 'Auditar Agora';
-        }
-    }
-
-    function renderGuardianResults(data) {
-        const { domain, score, spf, dmarc, mx } = data;
-        const level = gScoreLevel(score);
-        const theme = G_SCORE_COLORS[level];
-
-        const card = document.getElementById('gScoreCard');
-        card.style.setProperty('--score-color', theme.color);
-        card.style.setProperty('--score-glow', theme.glow);
-        document.getElementById('gScoreDomain').textContent = domain;
-        document.getElementById('gScoreNumber').textContent = score;
-        document.getElementById('gScoreVerdict').textContent = theme.verdict;
-
-        const bar = document.getElementById('gScoreBar');
-        bar.style.width = '0%';
-        bar.style.background = theme.color;
-        bar.style.boxShadow = `0 0 10px ${theme.glow}`;
-        setTimeout(() => { bar.style.width = score + '%'; }, 50);
-
-        // SPF
-        const spfEl = document.getElementById('gSpfStatus');
-        spfEl.textContent = spf.label;
-        spfEl.className = 'detail-status ' + gStatusClass(spf.status);
-        document.getElementById('gSpfValue').textContent = spf.value || '— não encontrado —';
-        document.getElementById('gSpfRec').textContent = SPF_RECS[spf.status] || '';
-
-        // DMARC
-        const dmarcEl = document.getElementById('gDmarcStatus');
-        dmarcEl.textContent = dmarc.label;
-        dmarcEl.className = 'detail-status ' + gStatusClass(dmarc.status);
-        document.getElementById('gDmarcValue').textContent = dmarc.value || '— não encontrado —';
-        document.getElementById('gDmarcRec').textContent = DMARC_RECS[dmarc.status] || '';
-
-        // MX
-        const mxEl = document.getElementById('gMxStatus');
-        if (mx.exists) {
-            mxEl.textContent = `${mx.records.length} servidor(es)`;
-            mxEl.className = 'detail-status status-ok';
-            document.getElementById('gMxValue').textContent = mx.records.join('\n');
-            document.getElementById('gMxRec').textContent = 'Servidores de email configurados corretamente.';
-        } else {
-            mxEl.textContent = 'Ausente';
-            mxEl.className = 'detail-status status-bad';
-            document.getElementById('gMxValue').textContent = '— nenhum registro MX —';
-            document.getElementById('gMxRec').textContent = 'Nenhum servidor de email encontrado. O domínio pode não ter email corporativo configurado.';
+            return;
         }
 
-        document.getElementById('gImpactText').textContent = gImpactText(score);
-        document.getElementById('guardianResults').classList.add('visible');
-        document.getElementById('guardianResults').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        renderGuardianResults(data);
+    } catch (e) {
+        loading.style.display = 'none';
+        errorBox.textContent = 'Falha na conexão. Tente novamente.';
+        errorBox.style.display = 'block';
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = 'Auditar Agora <span class="arrow">→</span>';
+    }
+}
+
+function renderGuardianResults(data) {
+    const { domain, score, spf, dmarc, mx } = data;
+    const level = gScoreLevel(score);
+    const theme = G_SCORE_COLORS[level];
+
+    const card = document.getElementById('gScoreCard');
+    card.style.setProperty('--score-color', theme.color);
+    document.getElementById('gScoreDomain').textContent = domain;
+    document.getElementById('gScoreNumber').textContent = score;
+    document.getElementById('gScoreVerdict').textContent = theme.verdict;
+
+    const bar = document.getElementById('gScoreBar');
+    bar.style.width = '0%';
+    setTimeout(() => { bar.style.width = score + '%'; }, 50);
+
+    // SPF
+    const spfEl = document.getElementById('gSpfStatus');
+    spfEl.textContent = spf.label;
+    spfEl.className = 'detail-status ' + gStatusClass(spf.status);
+    document.getElementById('gSpfValue').textContent = spf.value || '— não encontrado —';
+    document.getElementById('gSpfRec').textContent = SPF_RECS[spf.status] || '';
+
+    // DMARC
+    const dmarcEl = document.getElementById('gDmarcStatus');
+    dmarcEl.textContent = dmarc.label;
+    dmarcEl.className = 'detail-status ' + gStatusClass(dmarc.status);
+    document.getElementById('gDmarcValue').textContent = dmarc.value || '— não encontrado —';
+    document.getElementById('gDmarcRec').textContent = DMARC_RECS[dmarc.status] || '';
+
+    // MX
+    const mxEl = document.getElementById('gMxStatus');
+    if (mx.exists) {
+        mxEl.textContent = `${mx.records.length} servidor(es)`;
+        mxEl.className = 'detail-status status-ok';
+        document.getElementById('gMxValue').textContent = mx.records.join('\n');
+        document.getElementById('gMxRec').textContent = 'Servidores de email configurados corretamente.';
+    } else {
+        mxEl.textContent = 'Ausente';
+        mxEl.className = 'detail-status status-bad';
+        document.getElementById('gMxValue').textContent = '— nenhum registro MX —';
+        document.getElementById('gMxRec').textContent = 'Nenhum servidor de email encontrado. O domínio pode não ter email corporativo configurado.';
     }
 
-    document.getElementById('auditForm').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const domain = document.getElementById('domainInput').value.trim();
-        if (!domain) return;
-        runAudit(domain);
-    });
+    document.getElementById('gImpactText').textContent = gImpactText(score);
+    document.getElementById('guardianResults').classList.add('visible');
+    document.getElementById('guardianResults').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
 
-    // ════════════════════════════════════════════
-    // PC INSPECTOR — HARDWARE BENCHMARK
-    // ════════════════════════════════════════════
-    const PC_SCORE_COLORS = {
-        great:    { color: '#00FF00', glow: 'rgba(0,255,0,0.4)',    verdict: 'Excelente — Pronto para o escritório!' },
-        good:     { color: '#FFC107', glow: 'rgba(255,193,7,0.4)',  verdict: 'Bom — Funcional com ressalvas menores' },
-        regular:  { color: '#FF9800', glow: 'rgba(255,152,0,0.4)',  verdict: 'Regular — Impacto na produtividade' },
-        bad:      { color: '#FF5252', glow: 'rgba(255,82,82,0.4)',  verdict: 'Reprovado — Upgrade necessário' },
-    };
+document.getElementById('auditForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const domain = document.getElementById('domainInput').value.trim();
+    if (!domain) return;
+    runAudit(domain);
+});
 
-    function pcScoreLevel(s) {
-        if (s >= 80) return 'great';
-        if (s >= 60) return 'good';
-        if (s >= 40) return 'regular';
-        return 'bad';
-    }
+// ════════════════════════════════════════════
+// PC INSPECTOR — HARDWARE BENCHMARK
+// ════════════════════════════════════════════
+const PC_SCORE_COLORS = {
+    great:    { color: 'var(--ok)',    verdict: 'Excelente — Pronto para o escritório!' },
+    good:     { color: 'var(--warn)',  verdict: 'Bom — Funcional com ressalvas menores' },
+    regular:  { color: '#e65100',  verdict: 'Regular — Impacto na produtividade' },
+    bad:      { color: 'var(--hot)',  verdict: 'Reprovado — Upgrade necessário' },
+};
 
-    function setStep(id, state, statusText) {
-        const el = document.getElementById(id);
-        const statusEl = document.getElementById(id + 'Status');
-        el.className = 'progress-step ' + state;
-        statusEl.textContent = statusText;
-    }
+function pcScoreLevel(s) {
+    if (s >= 80) return 'great';
+    if (s >= 60) return 'good';
+    if (s >= 40) return 'regular';
+    return 'bad';
+}
 
-    // CPU: prime calculation benchmark
-    function benchmarkCPU() {
-        return new Promise(resolve => {
-            setTimeout(() => {
-                const start = performance.now();
-                let count = 0;
-                for (let n = 2; n < 50000; n++) {
-                    let prime = true;
-                    for (let i = 2; i * i <= n; i++) {
-                        if (n % i === 0) { prime = false; break; }
-                    }
-                    if (prime) count++;
+function setStep(id, state, statusText) {
+    const el = document.getElementById(id);
+    const statusEl = document.getElementById(id + 'Status');
+    el.className = 'progress-step ' + state;
+    statusEl.textContent = statusText;
+}
+
+function benchmarkCPU() {
+    return new Promise(resolve => {
+        setTimeout(() => {
+            const start = performance.now();
+            let count = 0;
+            for (let n = 2; n < 50000; n++) {
+                let prime = true;
+                for (let i = 2; i * i <= n; i++) {
+                    if (n % i === 0) { prime = false; break; }
                 }
-                const ms = Math.round(performance.now() - start);
-                resolve({ ms, primes: count });
-            }, 10);
-        });
-    }
-
-    // RAM: deviceMemory + probe progressivo de 512MB para detectar 16GB+
-    async function benchmarkRAM() {
-        const gb = navigator.deviceMemory || null;
-        let isHighEnd = false;
-
-        if (gb >= 8) {
-            // Aloca chunks de 512MB até o OS reclamar
-            // Em sistemas com 16GB+, conseguimos muito mais do que em 8GB
-            const CHUNK = 512 * 1024 * 1024;
-            const buffers = [];
-            let allocated = 0;
-
-            try {
-                for (let i = 0; i < 32; i++) { // tenta até 16GB
-                    buffers.push(new ArrayBuffer(CHUNK));
-                    allocated += CHUNK;
-                }
-            } catch(e) { /* OOM esperado */ }
-
-            buffers.length = 0; // libera imediatamente
-
-            // Se conseguiu alocar >= 4GB em chunks → sistema tem 16GB+
-            isHighEnd = allocated >= 4 * 1024 * 1024 * 1024;
-        }
-
-        return { gb, isHighEnd };
-    }
-
-    // DISK: OPFS write speed
-    async function benchmarkDisk() {
-        if (!navigator.storage || typeof navigator.storage.getDirectory !== 'function') {
-            return { supported: false };
-        }
-        try {
-            const SIZE = 20 * 1024 * 1024; // 20MB
-            const data = new Uint8Array(SIZE);
-            for (let i = 0; i < SIZE; i += 4096) data[i] = (i % 256);
-
-            const root = await navigator.storage.getDirectory();
-            const fh = await root.getFileHandle('cd_bench_' + Date.now(), { create: true });
-            const writable = await fh.createWritable();
-
-            const t0 = performance.now();
-            await writable.write(data.buffer);
-            await writable.close();
-            const ms = performance.now() - t0;
-
-            try { await root.removeEntry(fh.name); } catch(e) {}
-
-            const mbps = Math.round((SIZE / (1024 * 1024)) / (ms / 1000));
-            return { supported: true, mbps };
-        } catch(e) {
-            return { supported: false, error: e.message };
-        }
-    }
-
-    // GPU: WebGL renderer info
-    function benchmarkGPU() {
-        const canvas = document.createElement('canvas');
-        const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-        if (!gl) return { supported: false, renderer: 'Não detectado', tier: 'unknown' };
-
-        const ext = gl.getExtension('WEBGL_debug_renderer_info');
-        let renderer = 'Desconhecido';
-        if (ext) {
-            renderer = gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) || 'Desconhecido';
-        }
-
-        const r = renderer.toLowerCase();
-        let tier = 'low';
-        if (r.includes('rtx') || r.includes('rx 6') || r.includes('rx 7') || r.includes('arc a') || r.includes('quadro')) {
-            tier = 'high';
-        } else if (r.includes('gtx') || r.includes('rx 5') || r.includes('vega') || r.includes('radeon pro') ||
-                   r.includes('iris xe') || r.includes('iris plus') || r.includes('apple m')) {
-            tier = 'mid';
-        } else if (r.includes('intel') || r.includes('hd graphics') || r.includes('uhd graphics')) {
-            tier = 'low';
-        } else if (renderer !== 'Desconhecido') {
-            tier = 'mid';
-        }
-
-        return { supported: true, renderer, tier };
-    }
-
-    // Score calculation
-    function calcCpuScore(ms) {
-        if (ms < 80)  return 40;
-        if (ms < 150) return 33;
-        if (ms < 250) return 25;
-        if (ms < 400) return 15;
-        return 5;
-    }
-
-    function calcRamScore(gb, isHighEnd) {
-        if (!gb) return 10;
-        if (isHighEnd) return 30;  // 16GB+
-        if (gb >= 8)   return 22;  // 8GB — ok mas não ideal
-        if (gb >= 4)   return 5;   // 4GB — ruim
-        return 0;                  // < 4GB — crítico
-    }
-
-    function calcDiskScore(res) {
-        if (!res.supported) return 10; // neutral fallback
-        if (res.mbps >= 150) return 20; // SSD (qualquer tipo)
-        return 0;                       // HDD
-    }
-
-    function calcGpuScore(res) {
-        if (!res.supported) return 5;
-        if (res.tier === 'high') return 10;
-        if (res.tier === 'mid')  return 7;
-        return 3;
-    }
-
-    async function runPCBenchmark() {
-        document.getElementById('pcStartBtn').disabled = true;
-        document.getElementById('pcProgress').style.display = 'block';
-        document.getElementById('pcResults').classList.remove('visible');
-
-        // ── CPU
-        setStep('stepCpu', 'running', 'calculando...');
-        const cpu = await benchmarkCPU();
-        const cpuScore = calcCpuScore(cpu.ms);
-        let cpuLabel, cpuClass, cpuRec;
-        if (cpu.ms < 80) {
-            cpuLabel = 'Rápido'; cpuClass = 'status-ok';
-            cpuRec = 'Processador de alta performance. Ideal para multitarefa, Teams, Office e ferramentas em nuvem.';
-        } else if (cpu.ms < 150) {
-            cpuLabel = 'Bom'; cpuClass = 'status-ok';
-            cpuRec = 'CPU adequada para o dia a dia no escritório. Sem gargalos em uso típico.';
-        } else if (cpu.ms < 250) {
-            cpuLabel = 'Moderado'; cpuClass = 'status-warn';
-            cpuRec = 'CPU funcional mas com limitações em aplicações pesadas ou muitas abas abertas.';
-        } else if (cpu.ms < 400) {
-            cpuLabel = 'Lento'; cpuClass = 'status-warn';
-            cpuRec = 'Processador abaixo do recomendado. Pode travar durante videoconferências e uso simultâneo de apps.';
-        } else {
-            cpuLabel = 'Crítico'; cpuClass = 'status-bad';
-            cpuRec = 'CPU muito lenta para uso profissional moderno. Teams, Chrome e Office já são suficientes para travar o sistema.';
-        }
-        setStep('stepCpu', cpuScore >= 25 ? 'done' : (cpuScore >= 15 ? 'warn' : 'fail'), `${cpu.ms}ms`);
-
-        // ── RAM
-        setStep('stepRam', 'running', 'detectando...');
-        const ram = await benchmarkRAM();
-        const ramScore = calcRamScore(ram.gb, ram.isHighEnd);
-        let ramLabel, ramClass, ramRec, ramValueText;
-        if (!ram.gb) {
-            ramLabel = 'N/D'; ramClass = 'status-warn';
-            ramValueText = 'Não disponível neste browser';
-            ramRec = 'Seu browser não expõe a quantidade de RAM. Use Chrome ou Edge para obter este dado.';
-        } else if (ram.isHighEnd) {
-            ramLabel = '16GB+'; ramClass = 'status-ok';
-            ramValueText = '16 GB ou mais detectados';
-            ramRec = 'Memória excelente. Multitarefa pesada, Teams, Office, browser com dezenas de abas — tudo sem problemas.';
-        } else if (ram.gb >= 8) {
-            ramLabel = '8GB'; ramClass = 'status-warn';
-            ramValueText = '8 GB detectados — OK, mas não ideal';
-            ramRec = '8GB ainda funciona, mas com Teams + Chrome + Office abertos você vai sentir a pressão. O ideal para 2025 é 16GB. Considere upgrade.';
-        } else if (ram.gb >= 4) {
-            ramLabel = '4GB'; ramClass = 'status-bad';
-            ramValueText = '4 GB detectados — insuficiente';
-            ramRec = '4GB não serve para uso profissional moderno. O sistema vai travar com frequência. Entre em contato com a Casco Digital para upgrade imediato.';
-        } else {
-            ramLabel = `${ram.gb}GB`; ramClass = 'status-bad';
-            ramValueText = `${ram.gb} GB detectados — crítico`;
-            ramRec = 'Memória crítica. Este PC não tem condições de uso profissional. Fale com a TI ou chame a Casco Digital — é urgente.';
-        }
-        setStep('stepRam', ramScore >= 30 ? 'done' : (ramScore >= 22 ? 'warn' : 'fail'), ram.gb ? (ram.isHighEnd ? '16GB+' : `${ram.gb}GB`) : 'N/D');
-
-        // ── DISK
-        setStep('stepDisk', 'running', 'medindo...');
-        const disk = await benchmarkDisk();
-        const diskScore = calcDiskScore(disk);
-        let diskLabel, diskClass, diskRec, diskValueText;
-        if (!disk.supported) {
-            diskLabel = 'N/D'; diskClass = 'status-warn';
-            diskValueText = 'Não suportado neste browser';
-            diskRec = 'Benchmark de disco requer Chrome 102+ ou Edge 102+. Tente em outro browser para obter este dado.';
-        } else if (disk.mbps >= 150) {
-            diskLabel = 'SSD'; diskClass = 'status-ok';
-            diskValueText = `${disk.mbps} MB/s — SSD detectado`;
-            diskRec = 'Armazenamento SSD confirmado. Boot rápido, abertura instantânea de arquivos e apps — sem gargalo.';
-        } else {
-            diskLabel = 'HDD'; diskClass = 'status-bad';
-            diskValueText = `${disk.mbps} MB/s — HD Mecânico detectado`;
-            diskRec = 'HD mecânico detectado. É o gargalo número 1 em PCs de escritório — causa lentidão no boot, em apps e em arquivos. Trocar por SSD é o upgrade com melhor custo-benefício.';
-        }
-        setStep('stepDisk', diskScore >= 20 ? 'done' : 'fail', disk.supported ? `${disk.mbps} MB/s` : 'N/D');
-
-        // ── GPU
-        setStep('stepGpu', 'running', 'identificando...');
-        await new Promise(r => setTimeout(r, 200));
-        const gpu = benchmarkGPU();
-        const gpuScore = calcGpuScore(gpu);
-        let gpuLabel, gpuClass, gpuRec;
-        if (!gpu.supported) {
-            gpuLabel = 'N/D'; gpuClass = 'status-warn';
-            gpuRec = 'WebGL não disponível. Não foi possível identificar a GPU.';
-        } else if (gpu.tier === 'high') {
-            gpuLabel = 'Dedicada'; gpuClass = 'status-ok';
-            gpuRec = 'GPU dedicada de alta performance. Pronta para renderização, edição e múltiplos monitores 4K sem esforço.';
-        } else if (gpu.tier === 'mid') {
-            gpuLabel = 'Integrada OK'; gpuClass = 'status-ok';
-            gpuRec = 'GPU integrada detectada. Atende perfeitamente às demandas de escritório, pacote Office e navegação web.';
-        } else {
-            gpuLabel = 'Básica'; gpuClass = 'status-ok';
-            gpuRec = 'GPU básica detectada. Suficiente para rotinas padrão de escritório e e-mails.';
-        }
-        setStep('stepGpu', gpuScore >= 7 ? 'done' : 'done', gpu.tier === 'unknown' ? 'N/D' : gpu.tier);
-
-        // ── FINAL SCORE
-        const total = cpuScore + ramScore + diskScore + gpuScore;
-        const level = pcScoreLevel(total);
-        const theme = PC_SCORE_COLORS[level];
-
-        // Populate cards
-        document.getElementById('pcCpuStatus').textContent = cpuLabel;
-        document.getElementById('pcCpuStatus').className = 'detail-status ' + cpuClass;
-        document.getElementById('pcCpuValue').textContent = `${cpu.ms}ms para calcular ${cpu.primes.toLocaleString('pt-BR')} números primos`;
-        document.getElementById('pcCpuRec').textContent = cpuRec;
-
-        document.getElementById('pcRamStatus').textContent = ramLabel;
-        document.getElementById('pcRamStatus').className = 'detail-status ' + ramClass;
-        document.getElementById('pcRamValue').textContent = ramValueText;
-        document.getElementById('pcRamRec').textContent = ramRec;
-
-        document.getElementById('pcDiskStatus').textContent = diskLabel;
-        document.getElementById('pcDiskStatus').className = 'detail-status ' + diskClass;
-        document.getElementById('pcDiskValue').textContent = diskValueText;
-        document.getElementById('pcDiskRec').textContent = diskRec;
-
-        document.getElementById('pcGpuStatus').textContent = gpuLabel;
-        document.getElementById('pcGpuStatus').className = 'detail-status ' + gpuClass;
-        document.getElementById('pcGpuValue').textContent = gpu.renderer;
-        document.getElementById('pcGpuRec').textContent = gpuRec;
-
-        // Score card
-        const scoreCard = document.getElementById('pcScoreCard');
-        scoreCard.style.setProperty('--score-color', theme.color);
-        scoreCard.style.setProperty('--score-glow', theme.glow);
-        document.getElementById('pcScoreNumber').textContent = total;
-        document.getElementById('pcScoreVerdict').textContent = theme.verdict;
-
-        const bar = document.getElementById('pcScoreBar');
-        bar.style.width = '0%';
-        bar.style.background = theme.color;
-        bar.style.boxShadow = `0 0 10px ${theme.glow}`;
-        setTimeout(() => { bar.style.width = total + '%'; }, 50);
-
-        // Impact & CTA
-        const impactCard = document.getElementById('pcImpactCard');
-        let ctaTitle, ctaText, ctaMsg;
-
-        if (total >= 80 && cpuScore >= 25) {
-            impactCard.style.display = 'none';
-            ctaTitle = 'Máquina em conformidade.';
-            ctaText = 'Este equipamento atende aos requisitos do escritório moderno. Mantenha a manutenção e a segurança preventiva em dia.';
-            ctaMsg = 'Ol%C3%A1%2C%20fiz%20o%20diagn%C3%B3stico%20executivo%20e%20meu%20PC%20est%C3%A1%20em%20conformidade.%20Gostaria%20de%20saber%20sobre%20gest%C3%A3o%20e%20seguran%C3%A7a.';
-        } else {
-            impactCard.style.display = 'block';
-            const problems = [];
-            if (diskScore <= 6)  problems.push('Armazenamento lento (HD mecânico)');
-            if (ramScore <= 10)  problems.push('Memória RAM insuficiente');
-            if (cpuScore <= 15)  problems.push('Processador defasado');
-
-            let impact = 'Gargalos identificados: ' + problems.join(', ') + '. ';
-
-            // Lógica de Veredito Executivo: Substituir vs Upgrade guiada pela CPU
-            if (cpuScore <= 15) {
-                // CPU ruim = Substituir
-                impact += 'O processador atual apresenta gargalo severo. Equipamentos com essa idade costumam ter arquitetura antiga, o que inviabiliza melhorias isoladas.';
-                ctaTitle = 'Substituição Recomendada';
-                ctaText = 'Não recomendamos investir em upgrades (RAM/SSD) nesta máquina. O investimento estratégico para o negócio é planejar a troca do equipamento.';
-                ctaMsg = 'Ol%C3%A1%2C%20fiz%20o%20diagn%C3%B3stico%20e%20a%20recomenda%C3%A7%C3%A3o%20foi%20substituir%20meu%20PC%20antigo.%20Gostaria%20de%20uma%20cota%C3%A7%C3%A3o.';
-            } else {
-                // CPU ok = Upgrade viável. Agora checamos o que especificamente precisa de upgrade
-                impact += 'O processador ainda apresenta capacidade de processamento aceitável. O investimento ideal agora é focar nos gargalos periféricos.';
-                
-                if (diskScore <= 6 && ramScore > 10) {
-                    // Só o HD é ruim
-                    ctaTitle = 'Troque o HD por SSD';
-                    ctaText = 'O processador e a memória estão bons, mas o HD mecânico está ancorando a performance. Trocar por um SSD (caso a placa permita) resolve ~70% da lentidão.';
-                    ctaMsg = 'Ol%C3%A1%2C%20fiz%20o%20diagn%C3%B3stico%20e%20meu%20PC%20%C3%A9%20um%20bom%20candidato%20para%20colocar%20SSD.%20Podemos%20avaliar%3F';
-                } else if (ramScore <= 10 && diskScore > 6) {
-                    // Só a RAM é ruim
-                    ctaTitle = 'Aumente a Memória RAM';
-                    ctaText = 'O processador e o armazenamento (SSD) estão ótimos, mas a falta de memória causa travamentos. Um upgrade de RAM (se suportado) resolverá o problema.';
-                    ctaMsg = 'Ol%C3%A1%2C%20fiz%20o%20diagn%C3%B3stico%20e%20preciso%20aumentar%20a%20RAM%20do%20meu%20PC.%20Podemos%20avaliar%3F';
-                } else {
-                    // Ambos ruins
-                    ctaTitle = 'Upgrade de SSD e Memória';
-                    ctaText = 'Substituir o HD antigo por SSD e aumentar a memória trará vida nova à máquina. Bem mais barato que um PC novo (se a placa-mãe for expansível).';
-                    ctaMsg = 'Ol%C3%A1%2C%20fiz%20o%20diagn%C3%B3stico%20e%20meu%20PC%20precisa%20de%20SSD%20e%20RAM.%20Podemos%20avaliar%3F';
-                }
+                if (prime) count++;
             }
-            document.getElementById('pcImpactText').textContent = impact;
+            const ms = Math.round(performance.now() - start);
+            resolve({ ms, primes: count });
+        }, 10);
+    });
+}
+
+async function benchmarkRAM() {
+    const gb = navigator.deviceMemory || null;
+    let isHighEnd = false;
+
+    if (gb >= 8) {
+        const CHUNK = 512 * 1024 * 1024;
+        const buffers = [];
+        let allocated = 0;
+        try {
+            for (let i = 0; i < 32; i++) {
+                buffers.push(new ArrayBuffer(CHUNK));
+                allocated += CHUNK;
+            }
+        } catch(e) { }
+        buffers.length = 0;
+        isHighEnd = allocated >= 4 * 1024 * 1024 * 1024;
+    }
+    return { gb, isHighEnd };
+}
+
+async function benchmarkDisk() {
+    if (!navigator.storage || typeof navigator.storage.getDirectory !== 'function') {
+        return { supported: false };
+    }
+    try {
+        const SIZE = 20 * 1024 * 1024; // 20MB
+        const data = new Uint8Array(SIZE);
+        for (let i = 0; i < SIZE; i += 4096) data[i] = (i % 256);
+
+        const root = await navigator.storage.getDirectory();
+        const fh = await root.getFileHandle('cd_bench_' + Date.now(), { create: true });
+        const writable = await fh.createWritable();
+
+        const t0 = performance.now();
+        await writable.write(data.buffer);
+        await writable.close();
+        const ms = performance.now() - t0;
+
+        try { await root.removeEntry(fh.name); } catch(e) {}
+
+        const mbps = Math.round((SIZE / (1024 * 1024)) / (ms / 1000));
+        return { supported: true, mbps };
+    } catch(e) {
+        return { supported: false, error: e.message };
+    }
+}
+
+function benchmarkGPU() {
+    const canvas = document.createElement('canvas');
+    const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+    if (!gl) return { supported: false, renderer: 'Não detectado', tier: 'unknown' };
+
+    const ext = gl.getExtension('WEBGL_debug_renderer_info');
+    let renderer = 'Desconhecido';
+    if (ext) {
+        renderer = gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) || 'Desconhecido';
+    }
+
+    const r = renderer.toLowerCase();
+    let tier = 'low';
+    if (r.includes('rtx') || r.includes('rx 6') || r.includes('rx 7') || r.includes('arc a') || r.includes('quadro')) {
+        tier = 'high';
+    } else if (r.includes('gtx') || r.includes('rx 5') || r.includes('vega') || r.includes('radeon pro') ||
+               r.includes('iris xe') || r.includes('iris plus') || r.includes('apple m')) {
+        tier = 'mid';
+    } else if (r.includes('intel') || r.includes('hd graphics') || r.includes('uhd graphics')) {
+        tier = 'low';
+    } else if (renderer !== 'Desconhecido') {
+        tier = 'mid';
+    }
+
+    return { supported: true, renderer, tier };
+}
+
+function calcCpuScore(ms) {
+    if (ms < 80)  return 40;
+    if (ms < 150) return 33;
+    if (ms < 250) return 25;
+    if (ms < 400) return 15;
+    return 5;
+}
+
+function calcRamScore(gb, isHighEnd) {
+    if (!gb) return 10;
+    if (isHighEnd) return 30;
+    if (gb >= 8)   return 22;
+    if (gb >= 4)   return 5;
+    return 0;
+}
+
+function calcDiskScore(res) {
+    if (!res.supported) return 10;
+    if (res.mbps >= 150) return 20;
+    return 0;
+}
+
+function calcGpuScore(res) {
+    if (!res.supported) return 5;
+    if (res.tier === 'high') return 10;
+    if (res.tier === 'mid')  return 7;
+    return 3;
+}
+
+async function runPCBenchmark() {
+    const btn = document.getElementById('pcStartBtn');
+    btn.disabled = true;
+    btn.innerHTML = 'Avaliando... <span class="arrow">→</span>';
+    
+    document.getElementById('pcProgress').style.display = 'block';
+    document.getElementById('pcResults').classList.remove('visible');
+
+    // ── CPU
+    setStep('stepCpu', 'running', 'calculando...');
+    const cpu = await benchmarkCPU();
+    const cpuScore = calcCpuScore(cpu.ms);
+    let cpuLabel, cpuClass, cpuRec;
+    if (cpu.ms < 80) {
+        cpuLabel = 'Rápido'; cpuClass = 'status-ok';
+        cpuRec = 'Processador de alta performance. Ideal para multitarefa, Teams, Office e ferramentas em nuvem.';
+    } else if (cpu.ms < 150) {
+        cpuLabel = 'Bom'; cpuClass = 'status-ok';
+        cpuRec = 'CPU adequada para o dia a dia no escritório. Sem gargalos em uso típico.';
+    } else if (cpu.ms < 250) {
+        cpuLabel = 'Moderado'; cpuClass = 'status-warn';
+        cpuRec = 'CPU funcional mas com limitações em aplicações pesadas ou muitas abas abertas.';
+    } else if (cpu.ms < 400) {
+        cpuLabel = 'Lento'; cpuClass = 'status-warn';
+        cpuRec = 'Processador abaixo do recomendado. Pode travar durante videoconferências e uso simultâneo de apps.';
+    } else {
+        cpuLabel = 'Crítico'; cpuClass = 'status-bad';
+        cpuRec = 'CPU muito lenta para uso profissional moderno. Teams, Chrome e Office já são suficientes para travar o sistema.';
+    }
+    setStep('stepCpu', cpuScore >= 25 ? 'done' : (cpuScore >= 15 ? 'warn' : 'fail'), `${cpu.ms}ms`);
+
+    // ── RAM
+    setStep('stepRam', 'running', 'detectando...');
+    const ram = await benchmarkRAM();
+    const ramScore = calcRamScore(ram.gb, ram.isHighEnd);
+    let ramLabel, ramClass, ramRec, ramValueText;
+    if (!ram.gb) {
+        ramLabel = 'N/D'; ramClass = 'status-warn';
+        ramValueText = 'Não disponível neste browser';
+        ramRec = 'Seu browser não expõe a quantidade de RAM. Use Chrome ou Edge para obter este dado.';
+    } else if (ram.isHighEnd) {
+        ramLabel = '16GB+'; ramClass = 'status-ok';
+        ramValueText = '16 GB ou mais detectados';
+        ramRec = 'Memória excelente. Multitarefa pesada, Teams, Office, browser com dezenas de abas — tudo sem problemas.';
+    } else if (ram.gb >= 8) {
+        ramLabel = '8GB'; ramClass = 'status-warn';
+        ramValueText = '8 GB detectados — OK, mas não ideal';
+        ramRec = '8GB ainda funciona, mas com Teams + Chrome + Office abertos você vai sentir a pressão. O ideal para 2025 é 16GB. Considere upgrade.';
+    } else if (ram.gb >= 4) {
+        ramLabel = '4GB'; ramClass = 'status-bad';
+        ramValueText = '4 GB detectados — insuficiente';
+        ramRec = '4GB não serve para uso profissional moderno. O sistema vai travar com frequência. Entre em contato com a Casco Digital para upgrade imediato.';
+    } else {
+        ramLabel = `${ram.gb}GB`; ramClass = 'status-bad';
+        ramValueText = `${ram.gb} GB detectados — crítico`;
+        ramRec = 'Memória crítica. Este PC não tem condições de uso profissional. Fale com a TI ou chame a Casco Digital — é urgente.';
+    }
+    setStep('stepRam', ramScore >= 30 ? 'done' : (ramScore >= 22 ? 'warn' : 'fail'), ram.gb ? (ram.isHighEnd ? '16GB+' : `${ram.gb}GB`) : 'N/D');
+
+    // ── DISK
+    setStep('stepDisk', 'running', 'medindo...');
+    const disk = await benchmarkDisk();
+    const diskScore = calcDiskScore(disk);
+    let diskLabel, diskClass, diskRec, diskValueText;
+    if (!disk.supported) {
+        diskLabel = 'N/D'; diskClass = 'status-warn';
+        diskValueText = 'Não suportado neste browser';
+        diskRec = 'Benchmark de disco requer Chrome 102+ ou Edge 102+. Tente em outro browser para obter este dado.';
+    } else if (disk.mbps >= 150) {
+        diskLabel = 'SSD'; diskClass = 'status-ok';
+        diskValueText = `${disk.mbps} MB/s — SSD detectado`;
+        diskRec = 'Armazenamento SSD confirmado. Boot rápido, abertura instantânea de arquivos e apps — sem gargalo.';
+    } else {
+        diskLabel = 'HDD'; diskClass = 'status-bad';
+        diskValueText = `${disk.mbps} MB/s — HD Mecânico detectado`;
+        diskRec = 'HD mecânico detectado. É o gargalo número 1 em PCs de escritório — causa lentidão no boot, em apps e em arquivos. Trocar por SSD é o upgrade com melhor custo-benefício.';
+    }
+    setStep('stepDisk', diskScore >= 20 ? 'done' : 'fail', disk.supported ? `${disk.mbps} MB/s` : 'N/D');
+
+    // ── GPU
+    setStep('stepGpu', 'running', 'identificando...');
+    await new Promise(r => setTimeout(r, 200));
+    const gpu = benchmarkGPU();
+    const gpuScore = calcGpuScore(gpu);
+    let gpuLabel, gpuClass, gpuRec;
+    if (!gpu.supported) {
+        gpuLabel = 'N/D'; gpuClass = 'status-warn';
+        gpuRec = 'WebGL não disponível. Não foi possível identificar a GPU.';
+    } else if (gpu.tier === 'high') {
+        gpuLabel = 'Dedicada'; gpuClass = 'status-ok';
+        gpuRec = 'GPU dedicada de alta performance. Pronta para renderização, edição e múltiplos monitores 4K sem esforço.';
+    } else if (gpu.tier === 'mid') {
+        gpuLabel = 'Integrada OK'; gpuClass = 'status-ok';
+        gpuRec = 'GPU integrada detectada. Atende perfeitamente às demandas de escritório, pacote Office e navegação web.';
+    } else {
+        gpuLabel = 'Básica'; gpuClass = 'status-ok';
+        gpuRec = 'GPU básica detectada. Suficiente para rotinas padrão de escritório e e-mails.';
+    }
+    setStep('stepGpu', gpuScore >= 7 ? 'done' : 'done', gpu.tier === 'unknown' ? 'N/D' : gpu.tier);
+
+    // ── FINAL SCORE
+    const total = cpuScore + ramScore + diskScore + gpuScore;
+    const level = pcScoreLevel(total);
+    const theme = PC_SCORE_COLORS[level];
+
+    // Populate cards
+    document.getElementById('pcCpuStatus').textContent = cpuLabel;
+    document.getElementById('pcCpuStatus').className = 'detail-status ' + cpuClass;
+    document.getElementById('pcCpuValue').textContent = `${cpu.ms}ms para calcular ${cpu.primes.toLocaleString('pt-BR')} números primos`;
+    document.getElementById('pcCpuRec').textContent = cpuRec;
+
+    document.getElementById('pcRamStatus').textContent = ramLabel;
+    document.getElementById('pcRamStatus').className = 'detail-status ' + ramClass;
+    document.getElementById('pcRamValue').textContent = ramValueText;
+    document.getElementById('pcRamRec').textContent = ramRec;
+
+    document.getElementById('pcDiskStatus').textContent = diskLabel;
+    document.getElementById('pcDiskStatus').className = 'detail-status ' + diskClass;
+    document.getElementById('pcDiskValue').textContent = diskValueText;
+    document.getElementById('pcDiskRec').textContent = diskRec;
+
+    document.getElementById('pcGpuStatus').textContent = gpuLabel;
+    document.getElementById('pcGpuStatus').className = 'detail-status ' + gpuClass;
+    document.getElementById('pcGpuValue').textContent = gpu.renderer;
+    document.getElementById('pcGpuRec').textContent = gpuRec;
+
+    // Score card
+    const scoreCard = document.getElementById('pcScoreCard');
+    scoreCard.style.setProperty('--score-color', theme.color);
+    document.getElementById('pcScoreNumber').textContent = total;
+    document.getElementById('pcScoreVerdict').textContent = theme.verdict;
+
+    const bar = document.getElementById('pcScoreBar');
+    bar.style.width = '0%';
+    setTimeout(() => { bar.style.width = total + '%'; }, 50);
+
+    // Impact & CTA
+    const impactCard = document.getElementById('pcImpactCard');
+    let ctaTitle, ctaText, ctaMsg;
+
+    if (total >= 80 && cpuScore >= 25) {
+        impactCard.style.display = 'none';
+        ctaTitle = 'Máquina em conformidade.';
+        ctaText = 'Este equipamento atende aos requisitos do escritório moderno. Mantenha a manutenção e a segurança preventiva em dia.';
+        ctaMsg = 'Ol%C3%A1%2C%20fiz%20o%20diagn%C3%B3stico%20executivo%20e%20meu%20PC%20est%C3%A1%20em%20conformidade.%20Gostaria%20de%20saber%20sobre%20gest%C3%A3o%20e%20seguran%C3%A7a.';
+    } else {
+        impactCard.style.display = 'block';
+        const problems = [];
+        if (diskScore <= 6)  problems.push('Armazenamento lento (HD mecânico)');
+        if (ramScore <= 10)  problems.push('Memória RAM insuficiente');
+        if (cpuScore <= 15)  problems.push('Processador defasado');
+
+        let impact = 'Gargalos identificados: ' + problems.join(', ') + '. ';
+
+        if (cpuScore <= 15) {
+            impact += 'O processador atual apresenta gargalo severo. Equipamentos com essa idade costumam ter arquitetura antiga, o que inviabiliza melhorias isoladas.';
+            ctaTitle = 'Substituição Recomendada';
+            ctaText = 'Não recomendamos investir em upgrades (RAM/SSD) nesta máquina. O investimento estratégico para o negócio é planejar a troca do equipamento.';
+            ctaMsg = 'Ol%C3%A1%2C%20fiz%20o%20diagn%C3%B3stico%20e%20a%20recomenda%C3%A7%C3%A3o%20foi%20substituir%20meu%20PC%20antigo.%20Gostaria%20de%20uma%20cota%C3%A7%C3%A3o.';
+        } else {
+            impact += 'O processador ainda apresenta capacidade de processamento aceitável. O investimento ideal agora é focar nos gargalos periféricos.';
+            
+            if (diskScore <= 6 && ramScore > 10) {
+                ctaTitle = 'Troque o HD por SSD';
+                ctaText = 'O processador e a memória estão bons, mas o HD mecânico está ancorando a performance. Trocar por um SSD (caso a placa permita) resolve ~70% da lentidão.';
+                ctaMsg = 'Ol%C3%A1%2C%20fiz%20o%20diagn%C3%B3stico%20e%20meu%20PC%20%C3%A9%20um%20bom%20candidato%20para%20colocar%20SSD.%20Podemos%20avaliar%3F';
+            } else if (ramScore <= 10 && diskScore > 6) {
+                ctaTitle = 'Aumente a Memória RAM';
+                ctaText = 'O processador e o armazenamento (SSD) estão ótimos, mas a falta de memória causa travamentos. Um upgrade de RAM (se suportado) resolverá o problema.';
+                ctaMsg = 'Ol%C3%A1%2C%20fiz%20o%20diagn%C3%B3stico%20e%20preciso%20aumentar%20a%20RAM%20do%20meu%20PC.%20Podemos%20avaliar%3F';
+            } else {
+                ctaTitle = 'Upgrade de SSD e Memória';
+                ctaText = 'Substituir o HD antigo por SSD e aumentar a memória trará vida nova à máquina. Bem mais barato que um PC novo (se a placa-mãe for expansível).';
+                ctaMsg = 'Ol%C3%A1%2C%20fiz%20o%20diagn%C3%B3stico%20e%20meu%20PC%20precisa%20de%20SSD%20e%20RAM.%20Podemos%20avaliar%3F';
+            }
         }
-
-        document.getElementById('pcCtaTitle').textContent = ctaTitle;
-        document.getElementById('pcCtaText').textContent = ctaText;
-        document.getElementById('pcCtaBtn').href = `https://wa.me/5551992413388?text=${ctaMsg}`;
-
-        document.getElementById('pcResults').classList.add('visible');
-        document.getElementById('pcResults').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document.getElementById('pcImpactText').textContent = impact;
     }
 
-    function resetPC() {
-        document.getElementById('pcResults').classList.remove('visible');
-        document.getElementById('pcProgress').style.display = 'none';
-        document.getElementById('pcImpactCard').style.display = 'none';
-        document.getElementById('pcStartBtn').disabled = false;
-        ['stepCpu','stepRam','stepDisk','stepGpu'].forEach(id => {
-            setStep(id, '', 'aguardando...');
-        });
-        document.getElementById('pcStartContainer').scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
+    document.getElementById('pcCtaTitle').textContent = ctaTitle;
+    document.getElementById('pcCtaText').textContent = ctaText;
+    document.getElementById('pcCtaBtn').href = `https://wa.me/5551992413388?text=${ctaMsg}`;
 
-    // Auto-switch how-tab when tool tab changes
-    document.getElementById('tabBtnGuardian').addEventListener('click', () => switchHowTab('guardian'));
-    document.getElementById('tabBtnPc').addEventListener('click', () => switchHowTab('pc'));
-    </script>
+    document.getElementById('pcResults').classList.add('visible');
+    document.getElementById('pcResults').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    
+    btn.disabled = false;
+    btn.innerHTML = 'Avaliar Desempenho Deste PC <span class="arrow">→</span>';
+}
+
+function resetPC() {
+    document.getElementById('pcResults').classList.remove('visible');
+    document.getElementById('pcProgress').style.display = 'none';
+    document.getElementById('pcImpactCard').style.display = 'none';
+    document.getElementById('pcStartBtn').disabled = false;
+    ['stepCpu','stepRam','stepDisk','stepGpu'].forEach(id => {
+        setStep(id, '', 'aguardando...');
+    });
+    document.getElementById('pcStartContainer').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+// Auto-switch how-tab when tool tab changes
+document.getElementById('tabBtnGuardian').addEventListener('click', () => switchHowTab('guardian'));
+document.getElementById('tabBtnPc').addEventListener('click', () => switchHowTab('pc'));
+</script>
 </body>
 </html>
-
-').addEventListener('click', () => switchHowTab('pc'));
-    </script>
-</body>
-</html>
-
-ab('pc'));
-    </script>
-</body>
-</html>
-

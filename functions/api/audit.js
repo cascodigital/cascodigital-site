@@ -1,102 +1,103 @@
+/**
+ * Cloudflare Pages Function - The Guardian
+ * Endpoint GET /api/audit?domain=example.com
+ * Audita SPF, DMARC e MX via DNS over HTTPS (Cloudflare DoH)
+ * e retorna score de risco 0-100.
+ *
+ * Autor: Andre Kittler / Casco Digital
+ */
+
 const DOH = "https://cloudflare-dns.com/dns-query";
 
 async function dnsQuery(name, type) {
   const url = `${DOH}?name=${encodeURIComponent(name)}&type=${type}`;
-  const res = await fetch(url, { headers: { Accept: "application/dns-json" } });
-  if (!res.ok) return [];
-  const data = await res.json();
-  return data.Answer || [];
+  const resp = await fetch(url, { headers: { Accept: "application/dns-json" } });
+  if (!resp.ok) return null;
+  return resp.json();
 }
 
 function analyzeSPF(records) {
-  const spfRecord = records.find(r => r.data && r.data.includes("v=spf1"));
-  if (!spfRecord) return { status: "missing", label: "Ausente", value: null };
+  const raw = records.find((r) => r.data && r.data.replace(/"/g, "").trimStart().startsWith("v=spf1"));
+  if (!raw) return { exists: false, value: null, score: 40, status: "missing", label: "Ausente" };
 
-  const val = spfRecord.data.replace(/"/g, "").trim();
+  const val = raw.data.replace(/"/g, "");
+  if (val.includes("+all"))
+    return { exists: true, value: val, score: 35, status: "dangerous", label: "Perigoso (+all)" };
+  if (val.includes("?all"))
+    return { exists: true, value: val, score: 20, status: "weak", label: "Fraco (?all)" };
+  if (val.includes("~all"))
+    return { exists: true, value: val, score: 15, status: "softfail", label: "Softfail (~all)" };
+  if (val.includes("-all"))
+    return { exists: true, value: val, score: 5, status: "strict", label: "Restritivo (-all)" };
 
-  if (val.includes("+all")) return { status: "dangerous",  label: "Perigoso",  value: val };
-  if (val.includes("?all")) return { status: "weak",       label: "Fraco",     value: val };
-  if (val.includes("~all")) return { status: "softfail",   label: "Softfail",  value: val };
-  if (val.includes("-all")) return { status: "strict",     label: "Seguro",    value: val };
-  if (val.includes("v=spf1")) return { status: "incomplete", label: "Incompleto", value: val };
-
-  return { status: "missing", label: "Ausente", value: null };
+  return { exists: true, value: val, score: 15, status: "incomplete", label: "Incompleto" };
 }
 
 function analyzeDMARC(records) {
-  const dmarcRecord = records.find(r => r.data && r.data.includes("v=DMARC1"));
-  if (!dmarcRecord) return { status: "missing", label: "Ausente", value: null };
+  const raw = records.find((r) => r.data && r.data.includes("v=DMARC1"));
+  if (!raw) return { exists: false, value: null, score: 40, status: "missing", label: "Ausente" };
 
-  const val = dmarcRecord.data.replace(/"/g, "").trim();
+  const val = raw.data.replace(/"/g, "");
+  if (val.includes("p=reject"))
+    return { exists: true, value: val, score: 0, status: "strict", label: "Rejeição (p=reject)" };
+  if (val.includes("p=quarantine"))
+    return { exists: true, value: val, score: 5, status: "moderate", label: "Quarentena (p=quarantine)" };
+  if (val.includes("p=none"))
+    return { exists: true, value: val, score: 20, status: "monitoring", label: "Monitoramento (p=none)" };
 
-  if (val.includes("p=reject"))     return { status: "strict",     label: "Máximo",      value: val };
-  if (val.includes("p=quarantine")) return { status: "moderate",   label: "Moderado",    value: val };
-  if (val.includes("p=none"))       return { status: "monitoring", label: "Monitorando", value: val };
-
-  return { status: "incomplete", label: "Incompleto", value: val };
-}
-
-function calcScore(spf, dmarc, mx) {
-  let score = 100;
-
-  // SPF penalties
-  if      (spf.status === "missing")    score -= 35;
-  else if (spf.status === "dangerous")  score -= 40;
-  else if (spf.status === "weak")       score -= 30;
-  else if (spf.status === "softfail")   score -= 10;
-  else if (spf.status === "incomplete") score -= 15;
-
-  // DMARC penalties
-  if      (dmarc.status === "missing")    score -= 40;
-  else if (dmarc.status === "monitoring") score -= 20;
-  else if (dmarc.status === "moderate")   score -= 5;
-  else if (dmarc.status === "incomplete") score -= 15;
-
-  // MX penalty (minor)
-  if (!mx.exists) score -= 5;
-
-  return Math.max(0, Math.min(100, score));
+  return { exists: true, value: val, score: 15, status: "incomplete", label: "Incompleto" };
 }
 
 export async function onRequestGet(context) {
-  const url = new URL(context.request.url);
-  const domain = url.searchParams.get("domain");
+  const { request } = context;
+  const url = new URL(request.url);
+  const rawDomain = url.searchParams.get("domain") || "";
 
-  const cors = {
-    "Content-Type": "application/json",
-    "Access-Control-Allow-Origin": "*",
-  };
+  const domain = rawDomain
+    .replace(/^https?:\/\//, "")
+    .replace(/\/.*$/, "")
+    .toLowerCase()
+    .trim();
 
   if (!domain) {
-    return new Response(JSON.stringify({ ok: false, error: "Domínio não informado." }), { status: 400, headers: cors });
+    return json({ ok: false, error: "Parâmetro 'domain' obrigatório." }, 400);
   }
-
-  // Sanitize
-  const cleanDomain = domain.trim().toLowerCase().replace(/^https?:\/\//, "").replace(/\/.*$/, "");
 
   try {
-    const [txtRecords, dmarcRecords, mxRecords] = await Promise.all([
-      dnsQuery(cleanDomain, "TXT"),
-      dnsQuery(`_dmarc.${cleanDomain}`, "TXT"),
-      dnsQuery(cleanDomain, "MX"),
+    const [txtRes, dmarcRes, mxRes] = await Promise.all([
+      dnsQuery(domain, "TXT"),
+      dnsQuery(`_dmarc.${domain}`, "TXT"),
+      dnsQuery(domain, "MX"),
     ]);
 
-    const spf   = analyzeSPF(txtRecords);
-    const dmarc = analyzeDMARC(dmarcRecords);
-    const mx    = {
-      exists:  mxRecords.length > 0,
-      records: mxRecords.map(r => r.data).slice(0, 5),
-    };
-    const score = calcScore(spf, dmarc, mx);
+    const spf = analyzeSPF(txtRes?.Answer || []);
+    const dmarc = analyzeDMARC(dmarcRes?.Answer || []);
 
-    return new Response(JSON.stringify({ ok: true, domain: cleanDomain, score, spf, dmarc, mx }), {
-      status: 200,
-      headers: cors,
+    const mxRecords = (mxRes?.Answer || []).map((r) => r.data).filter(Boolean);
+    const mxExists = mxRecords.length > 0;
+    const mxScore = mxExists ? 0 : 10;
+
+    const score = Math.min(100, spf.score + dmarc.score + mxScore);
+
+    return json({
+      ok: true,
+      domain,
+      score,
+      spf,
+      dmarc,
+      mx: { exists: mxExists, records: mxRecords, score: mxScore },
     });
   } catch (err) {
-    return new Response(JSON.stringify({ ok: false, error: "Erro ao consultar DNS. Tente novamente." }), {
-      status: 500,
-      headers: cors,
-    });
+    return json({ ok: false, error: err.message }, 500);
   }
+}
+
+function json(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+    },
+  });
 }
